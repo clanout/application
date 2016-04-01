@@ -1,0 +1,28 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>application</artifactId>
+        <groupId>com.clanout.application</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>framework</artifactId>
+    <packaging>jar</packaging>
+
+    <name>clanout-application-framework</name>
+
+    <properties>
+        <commons-configuration.version>1.10</commons-configuration.version>
+    </properties>
+
+    <dependencies>
+        <!-- Apache Commons Configuration -->
+        <dependency>
+            <groupId>commons-configuration</groupId>
+            <artifactId>commons-configuration</artifactId>
+            <version>${commons-configuration.version}</version>
+        </dependency>
+    </dependencies>
+</project>
