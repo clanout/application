@@ -2,7 +2,7 @@ package com.clanout.application.module.auth.context;
 
 import com.clanout.application.framework.di.ModuleScope;
 import com.clanout.application.library.async.AsyncPool;
-import com.clanout.application.module.auth.data.postgres.PostgresTokenRepository;
+import com.clanout.application.module.auth.data.token.PostgresTokenRepository;
 import com.clanout.application.module.auth.domain.repository.TokenRepository;
 import com.clanout.application.module.user.context.UserContext;
 import com.clanout.application.module.user.domain.use_case.AddFriends;

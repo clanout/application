@@ -3,42 +3,38 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>application</artifactId>
+        <artifactId>modules</artifactId>
         <groupId>com.clanout.application</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>modules</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>module-image</artifactId>
+    <packaging>jar</packaging>
 
-    <name>clanout-application-modules</name>
+    <name>clanout-application-module-image</name>
 
-    <modules>
-        <module>auth</module>
-        <module>user</module>
-        <module>location</module>
-        <module>image</module>
-    </modules>
+    <properties>
+    </properties>
 
     <dependencies>
-        <!-- Framework -->
+        <!-- User Module -->
         <dependency>
             <groupId>com.clanout.application</groupId>
-            <artifactId>framework</artifactId>
+            <artifactId>module-user</artifactId>
             <version>${clanout.version}</version>
         </dependency>
 
-        <!-- Util Library -->
+        <!-- Redis Library -->
         <dependency>
             <groupId>com.clanout.application</groupId>
-            <artifactId>lib-util</artifactId>
+            <artifactId>lib-redis</artifactId>
             <version>${clanout.version}</version>
         </dependency>
 
-        <!-- Async Library -->
+        <!-- Postgres Library -->
         <dependency>
             <groupId>com.clanout.application</groupId>
-            <artifactId>lib-async</artifactId>
+            <artifactId>lib-postgres</artifactId>
             <version>${clanout.version}</version>
         </dependency>
     </dependencies>

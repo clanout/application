@@ -5,8 +5,10 @@ import com.clanout.application.framework.lib.Library;
 import com.clanout.application.framework.module.Context;
 import com.clanout.application.library.async.AsyncLibrary;
 import com.clanout.application.library.postgres.PostgresLibrary;
+import com.clanout.application.library.redis.RedisLibrary;
 import com.clanout.application.library.util.UtilLibrary;
 import com.clanout.application.module.auth.context.AuthContext;
+import com.clanout.application.module.image.context.ImageContext;
 import com.clanout.application.module.location.context.LocationContext;
 import com.clanout.application.module.user.context.UserContext;
 import org.apache.logging.log4j.LogManager;
@@ -69,6 +71,9 @@ public class ApplicationContext
 
         AuthContext authContext = new AuthContext(userContext);
         modules.put(Module.AUTH, authContext);
+
+        ImageContext imageContext = new ImageContext(userContext);
+        modules.put(Module.IMAGE, imageContext);
     }
 
     private void initLibs(ExecutorService backgroundPool) throws Exception
@@ -83,5 +88,8 @@ public class ApplicationContext
 
         PostgresLibrary postgresLibrary = new PostgresLibrary();
         libs.put(Lib.POSTGRES, postgresLibrary);
+
+        RedisLibrary redisLibrary = new RedisLibrary();
+        libs.put(Lib.REDIS, redisLibrary);
     }
 }

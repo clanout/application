@@ -1,7 +1,7 @@
 package com.clanout.application.module.user.domain;
 
 import com.clanout.application.library.postgres.PostgresDataSource;
-import com.clanout.application.module.user.data.postgres.PostgresUserRepository;
+import com.clanout.application.module.user.data.user.PostgresUserRepository;
 import com.clanout.application.module.user.domain.model.User;
 import com.clanout.application.module.user.domain.repository.UserRepository;
 

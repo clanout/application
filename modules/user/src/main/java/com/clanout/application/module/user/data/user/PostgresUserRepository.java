@@ -1,4 +1,4 @@
-package com.clanout.application.module.user.data.postgres;
+package com.clanout.application.module.user.data.user;
 
 import com.clanout.application.library.postgres.PostgresDataSource;
 import com.clanout.application.library.postgres.PostgresQuery;
@@ -10,7 +10,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class PostgresUserRepository implements UserRepository
@@ -19,7 +18,6 @@ public class PostgresUserRepository implements UserRepository
 
     private static final String SQL_INSERT_USER = PostgresQuery.load("insert_user.sql", PostgresUserRepository.class);
     private static final String SQL_INSERT_FRIENDS = PostgresQuery.load("insert_friends.sql", PostgresUserRepository.class);
-    private static final String SQL_INSERT_BLOCKED_FRIENDS = PostgresQuery.load("insert_blocked_friends.sql", PostgresUserRepository.class);
 
     private static final String SQL_READ_USER = PostgresQuery.load("read_user.sql", PostgresUserRepository.class);
     private static final String SQL_READ_USER_USERNAME = PostgresQuery.load("read_user_username.sql", PostgresUserRepository.class);
@@ -29,8 +27,8 @@ public class PostgresUserRepository implements UserRepository
     private static final String SQL_UPDATE_LOCATION = PostgresQuery.load("update_location.sql", PostgresUserRepository.class);
     private static final String SQL_UPDATE_MOBILE = PostgresQuery.load("update_mobile.sql", PostgresUserRepository.class);
 
-    private static final String SQL_DELETE_FRIENDS = PostgresQuery.load("delete_friends.sql", PostgresUserRepository.class);
-    private static final String SQL_DELETE_BLOCKED_FRIENDS = PostgresQuery.load("delete_blocked_friends.sql", PostgresUserRepository.class);
+    private static final String SQL_BLOCK_FRIEND = PostgresQuery.load("block_friend.sql", PostgresUserRepository.class);
+    private static final String SQL_UNBLOCK_FRIEND = PostgresQuery.load("unblock_friend.sql", PostgresUserRepository.class);
 
     @Override
     public void create(User user)
@@ -275,23 +273,28 @@ public class PostgresUserRepository implements UserRepository
     {
         try (Connection connection = PostgresDataSource.getInstance().getConnection())
         {
-            connection.setAutoCommit(false);
-
-            PreparedStatement statement = connection.prepareStatement(SQL_INSERT_BLOCKED_FRIENDS);
-            statement.setString(1, userId);
-            statement.setArray(2, connection.createArrayOf("varchar", toBlock.toArray()));
-            statement.executeUpdate();
-            statement.close();
-
-            statement = connection.prepareStatement(SQL_DELETE_FRIENDS);
-            statement.setString(1, userId);
-            statement.setArray(2, connection.createArrayOf("varchar", toBlock.toArray()));
-            statement.setString(3, userId);
-            statement.setArray(4, connection.createArrayOf("varchar", toBlock.toArray()));
-            statement.executeUpdate();
-            statement.close();
-
-            connection.commit();
+            for (String friendId : toBlock)
+            {
+                try
+                {
+                    PreparedStatement statement = connection.prepareStatement(SQL_BLOCK_FRIEND);
+                    statement.setString(1, userId);
+                    statement.setString(2, friendId);
+                    statement.setString(3, userId);
+                    statement.setString(4, friendId);
+                    statement.setString(5, userId);
+                    statement.setString(6, friendId);
+                    statement.executeUpdate();
+                    statement.close();
+                }
+                catch (SQLException e)
+                {
+                    if (!e.getSQLState().equals("23505"))
+                    {
+                        throw e;
+                    }
+                }
+            }
         }
         catch (SQLException e)
         {
@@ -305,21 +308,26 @@ public class PostgresUserRepository implements UserRepository
     {
         try (Connection connection = PostgresDataSource.getInstance().getConnection())
         {
-            connection.setAutoCommit(false);
-
-            PreparedStatement statement = connection.prepareStatement(SQL_INSERT_FRIENDS);
-            statement.setString(1, userId);
-            statement.setArray(2, connection.createArrayOf("varchar", toUnblock.toArray()));
-            statement.executeUpdate();
-            statement.close();
-
-            statement = connection.prepareStatement(SQL_DELETE_BLOCKED_FRIENDS);
-            statement.setString(1, userId);
-            statement.setArray(2, connection.createArrayOf("varchar", toUnblock.toArray()));
-            statement.executeUpdate();
-            statement.close();
-
-            connection.commit();
+            for (String friendId : toUnblock)
+            {
+                try
+                {
+                    PreparedStatement statement = connection.prepareStatement(SQL_UNBLOCK_FRIEND);
+                    statement.setString(1, userId);
+                    statement.setString(2, friendId);
+                    statement.setString(3, userId);
+                    statement.setString(4, friendId);
+                    statement.executeUpdate();
+                    statement.close();
+                }
+                catch (SQLException e)
+                {
+                    if (!e.getSQLState().equals("23505"))
+                    {
+                        throw e;
+                    }
+                }
+            }
         }
         catch (SQLException e)
         {

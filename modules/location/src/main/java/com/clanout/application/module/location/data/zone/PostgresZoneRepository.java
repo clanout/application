@@ -1,4 +1,4 @@
-package com.clanout.application.module.location.data.postgres;
+package com.clanout.application.module.location.data.zone;
 
 import com.clanout.application.library.postgres.PostgresDataSource;
 import com.clanout.application.library.postgres.PostgresQuery;

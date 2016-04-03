@@ -41,6 +41,12 @@
             <version>${clanout.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.clanout.application</groupId>
+            <artifactId>module-image</artifactId>
+            <version>${clanout.version}</version>
+        </dependency>
+
         <!-- Libraries -->
         <dependency>
             <groupId>com.clanout.application</groupId>
@@ -57,6 +63,12 @@
         <dependency>
             <groupId>com.clanout.application</groupId>
             <artifactId>lib-postgres</artifactId>
+            <version>${clanout.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.clanout.application</groupId>
+            <artifactId>lib-redis</artifactId>
             <version>${clanout.version}</version>
         </dependency>
 

@@ -1,4 +1,4 @@
-package com.clanout.application.module.user.data.postgres;
+package com.clanout.application.module.user.data.user;
 
 import com.clanout.application.module.user.domain.model.User;
 

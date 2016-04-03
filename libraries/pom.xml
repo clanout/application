@@ -17,6 +17,7 @@
         <module>util</module>
         <module>postgres</module>
         <module>async</module>
+        <module>redis</module>
     </modules>
 
     <dependencies>

@@ -5,5 +5,6 @@ public enum Module
 {
     LOCATION,
     USER,
-    AUTH
+    AUTH,
+    IMAGE
 }

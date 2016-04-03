@@ -1,4 +1,4 @@
-package com.clanout.application.module.auth.data.postgres;
+package com.clanout.application.module.auth.data.token;
 
 import com.clanout.application.library.postgres.PostgresDataSource;
 import com.clanout.application.library.postgres.PostgresQuery;
