@@ -1,0 +1,3 @@
+SELECT encryption_key
+FROM session_encryption_key
+LIMIT 1

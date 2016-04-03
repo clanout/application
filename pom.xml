@@ -22,6 +22,7 @@
         <clanout.version>1.0-SNAPSHOT</clanout.version>
 
         <log4j.version>2.3</log4j.version>
+        <dagger.version>2.0.1</dagger.version>
     </properties>
 
     <dependencies>
@@ -30,6 +31,19 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
             <version>${log4j.version}</version>
+        </dependency>
+
+        <!-- Dependency Injection (Dagger 2) -->
+        <dependency>
+            <groupId>com.google.dagger</groupId>
+            <artifactId>dagger</artifactId>
+            <version>${dagger.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.dagger</groupId>
+            <artifactId>dagger-compiler</artifactId>
+            <version>${dagger.version}</version>
         </dependency>
     </dependencies>
 

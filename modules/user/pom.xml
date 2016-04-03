@@ -3,28 +3,25 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>application</artifactId>
+        <artifactId>modules</artifactId>
         <groupId>com.clanout.application</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>libraries</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>module-user</artifactId>
+    <packaging>jar</packaging>
 
-    <name>clanout-application-libraries</name>
+    <name>clanout-application-module-user</name>
 
-    <modules>
-        <module>util</module>
-        <module>postgres</module>
-        <module>async</module>
-    </modules>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
     <dependencies>
-
-        <!-- Framework -->
+        <!-- Postgres -->
         <dependency>
             <groupId>com.clanout.application</groupId>
-            <artifactId>framework</artifactId>
+            <artifactId>lib-postgres</artifactId>
             <version>${clanout.version}</version>
         </dependency>
 

@@ -22,10 +22,35 @@
             <version>${clanout.version}</version>
         </dependency>
 
+        <!-- Modules -->
+        <dependency>
+            <groupId>com.clanout.application</groupId>
+            <artifactId>module-auth</artifactId>
+            <version>${clanout.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.clanout.application</groupId>
+            <artifactId>module-location</artifactId>
+            <version>${clanout.version}</version>
+        </dependency>
+
         <!-- Libraries -->
         <dependency>
             <groupId>com.clanout.application</groupId>
             <artifactId>lib-util</artifactId>
+            <version>${clanout.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.clanout.application</groupId>
+            <artifactId>lib-async</artifactId>
+            <version>${clanout.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.clanout.application</groupId>
+            <artifactId>lib-postgres</artifactId>
             <version>${clanout.version}</version>
         </dependency>
 

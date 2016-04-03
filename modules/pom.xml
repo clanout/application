@@ -13,10 +13,31 @@
 
     <name>clanout-application-modules</name>
 
+    <modules>
+        <module>auth</module>
+        <module>user</module>
+        <module>location</module>
+    </modules>
+
     <dependencies>
+        <!-- Framework -->
         <dependency>
             <groupId>com.clanout.application</groupId>
             <artifactId>framework</artifactId>
+            <version>${clanout.version}</version>
+        </dependency>
+
+        <!-- Util Library -->
+        <dependency>
+            <groupId>com.clanout.application</groupId>
+            <artifactId>lib-util</artifactId>
+            <version>${clanout.version}</version>
+        </dependency>
+
+        <!-- Async Library -->
+        <dependency>
+            <groupId>com.clanout.application</groupId>
+            <artifactId>lib-async</artifactId>
             <version>${clanout.version}</version>
         </dependency>
     </dependencies>
