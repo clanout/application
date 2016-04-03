@@ -4,7 +4,7 @@ import com.clanout.application.framework.module.Context;
 import com.clanout.application.module.auth.domain.use_case.CreateSession;
 import com.clanout.application.module.auth.domain.use_case.RefreshSession;
 import com.clanout.application.module.auth.domain.use_case.VerifySession;
-import com.clanout.application.module.location.context.LocationContext;
+import com.clanout.application.module.user.context.UserContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,13 +13,17 @@ public class AuthContext implements Context
     private static Logger LOG = LogManager.getRootLogger();
 
     private AuthDependencyInjector injector;
-    private LocationContext locationContext;
 
-    public AuthContext(LocationContext locationContext)
+    private UserContext userContext;
+
+    public AuthContext(UserContext userContext)
     {
         LOG.debug("[AuthContext initialized]");
-        injector = DaggerAuthDependencyInjector.create();
-        this.locationContext = locationContext;
+        this.userContext = userContext;
+        injector = DaggerAuthDependencyInjector
+                .builder()
+                .authDependencyProvider(new AuthDependencyProvider(userContext))
+                .build();
     }
 
     @Override

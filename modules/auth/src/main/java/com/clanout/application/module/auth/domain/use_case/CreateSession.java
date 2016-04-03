@@ -3,14 +3,14 @@ package com.clanout.application.module.auth.domain.use_case;
 import com.clanout.application.framework.di.ModuleScope;
 import com.clanout.application.library.util.common.StringUtils;
 import com.clanout.application.module.auth.domain.exception.CreateSessionException;
-import com.clanout.application.module.auth.domain.exception.CreateUserException;
-import com.clanout.application.module.auth.domain.model.AuthMethod;
 import com.clanout.application.module.auth.domain.exception.InvalidAuthMethodException;
 import com.clanout.application.module.auth.domain.exception.InvalidAuthTokenException;
-import com.clanout.application.module.auth.domain.model.User;
+import com.clanout.application.module.auth.domain.model.AuthMethod;
+import com.clanout.application.module.auth.domain.model.AuthenticatedUser;
 import com.clanout.application.module.auth.domain.repository.TokenRepository;
 import com.clanout.application.module.auth.domain.service.FacebookService;
 import com.clanout.application.module.auth.domain.service.TokenService;
+import com.clanout.application.module.user.domain.exception.InvalidUserFieldException;
 
 import javax.inject.Inject;
 import java.util.concurrent.ExecutorService;
@@ -35,7 +35,8 @@ public class CreateSession
     }
 
     public Response execute(Request request) throws InvalidAuthMethodException,
-            InvalidAuthTokenException, CreateSessionException, CreateUserException
+            InvalidAuthTokenException, CreateSessionException,
+            InvalidUserFieldException, com.clanout.application.module.user.domain.exception.CreateUserException
     {
         AuthMethod authMethod = null;
         try
@@ -52,11 +53,11 @@ public class CreateSession
             throw new InvalidAuthTokenException();
         }
 
-        User user = null;
+        AuthenticatedUser user = null;
         switch (authMethod)
         {
             case FACEBOOK:
-                user = facebookService.getUser(request.authToken);
+                user = facebookService.getAUthenticatedUser(request.authToken);
                 break;
 
             default:

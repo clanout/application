@@ -18,6 +18,13 @@
     </properties>
 
     <dependencies>
+        <!-- Location Module -->
+        <dependency>
+            <groupId>com.clanout.application</groupId>
+            <artifactId>module-location</artifactId>
+            <version>${clanout.version}</version>
+        </dependency>
+
         <!-- Postgres -->
         <dependency>
             <groupId>com.clanout.application</groupId>

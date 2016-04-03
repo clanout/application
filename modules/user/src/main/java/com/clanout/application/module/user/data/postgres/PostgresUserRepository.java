@@ -1,9 +1,9 @@
-package com.clanout.application.module.auth.data.postgres;
+package com.clanout.application.module.user.data.postgres;
 
 import com.clanout.application.library.postgres.PostgresDataSource;
 import com.clanout.application.library.postgres.PostgresQuery;
-import com.clanout.application.module.auth.domain.model.User;
-import com.clanout.application.module.auth.domain.repository.UserRepository;
+import com.clanout.application.module.user.domain.model.User;
+import com.clanout.application.module.user.domain.repository.UserRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,8 +15,8 @@ public class PostgresUserRepository implements UserRepository
 {
     private static Logger LOG = LogManager.getRootLogger();
 
-    private static final String SQL_INSERT_USER = PostgresQuery.load("insert_user.sql", PostgresTokenRepository.class);
-    private static final String SQL_READ_USER = PostgresQuery.load("read_user.sql", PostgresTokenRepository.class);
+    private static final String SQL_INSERT_USER = PostgresQuery.load("insert_user.sql", PostgresUserRepository.class);
+    private static final String SQL_READ_USER = PostgresQuery.load("read_user.sql", PostgresUserRepository.class);
 
     @Override
     public void create(User user)

@@ -1,4 +1,4 @@
-package com.clanout.application.module.auth.domain.model;
+package com.clanout.application.module.user.domain.model;
 
 import java.time.OffsetDateTime;
 
@@ -14,8 +14,6 @@ public class User
     private String usernameType;
     private String locationZone;
     private OffsetDateTime createdAt;
-
-    private boolean isNew;
 
     public String getUserId()
     {
@@ -115,15 +113,5 @@ public class User
     public void setCreatedAt(OffsetDateTime createdAt)
     {
         this.createdAt = createdAt;
-    }
-
-    public boolean isNew()
-    {
-        return isNew;
-    }
-
-    public void setIsNew(boolean isNew)
-    {
-        this.isNew = isNew;
     }
 }

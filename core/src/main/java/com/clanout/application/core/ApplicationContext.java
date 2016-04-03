@@ -8,6 +8,7 @@ import com.clanout.application.library.postgres.PostgresLibrary;
 import com.clanout.application.library.util.UtilLibrary;
 import com.clanout.application.module.auth.context.AuthContext;
 import com.clanout.application.module.location.context.LocationContext;
+import com.clanout.application.module.user.context.UserContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -63,7 +64,10 @@ public class ApplicationContext
         LocationContext locationContext = new LocationContext();
         modules.put(Module.LOCATION, locationContext);
 
-        AuthContext authContext = new AuthContext(locationContext);
+        UserContext userContext = new UserContext(locationContext);
+        modules.put(Module.USER, userContext);
+
+        AuthContext authContext = new AuthContext(userContext);
         modules.put(Module.AUTH, authContext);
     }
 

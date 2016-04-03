@@ -25,13 +25,19 @@
         <!-- Modules -->
         <dependency>
             <groupId>com.clanout.application</groupId>
-            <artifactId>module-auth</artifactId>
+            <artifactId>module-location</artifactId>
             <version>${clanout.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.clanout.application</groupId>
-            <artifactId>module-location</artifactId>
+            <artifactId>module-user</artifactId>
+            <version>${clanout.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.clanout.application</groupId>
+            <artifactId>module-auth</artifactId>
             <version>${clanout.version}</version>
         </dependency>
 

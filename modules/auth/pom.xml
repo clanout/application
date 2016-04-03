@@ -19,10 +19,10 @@
     </properties>
 
     <dependencies>
-        <!-- Location Module -->
+        <!-- User Module -->
         <dependency>
             <groupId>com.clanout.application</groupId>
-            <artifactId>module-location</artifactId>
+            <artifactId>module-user</artifactId>
             <version>${clanout.version}</version>
         </dependency>
 

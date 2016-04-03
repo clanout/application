@@ -2,10 +2,13 @@ package com.clanout.application.module.auth.domain.service;
 
 import com.clanout.application.framework.di.ModuleScope;
 import com.clanout.application.library.util.gson.GsonProvider;
-import com.clanout.application.module.auth.domain.exception.CreateUserException;
 import com.clanout.application.module.auth.domain.exception.InvalidAuthTokenException;
-import com.clanout.application.module.auth.domain.model.User;
-import com.clanout.application.module.auth.domain.repository.UserRepository;
+import com.clanout.application.module.auth.domain.model.AuthenticatedUser;
+import com.clanout.application.module.user.domain.exception.CreateUserException;
+import com.clanout.application.module.user.domain.exception.InvalidUserFieldException;
+import com.clanout.application.module.user.domain.model.User;
+import com.clanout.application.module.user.domain.use_case.CreateUser;
+import com.clanout.application.module.user.domain.use_case.FetchUserFromUsername;
 import com.google.gson.annotations.SerializedName;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -27,18 +30,19 @@ public class FacebookService
             "&access_token=";
 
     private OkHttpClient okHttpClient;
-    private UserRepository userRepository;
-    private UserService userService;
+    private FetchUserFromUsername fetchUserFromUsername;
+    private CreateUser createUser;
 
     @Inject
-    public FacebookService(UserRepository userRepository, UserService userService)
+    public FacebookService(FetchUserFromUsername fetchUserFromUsername, CreateUser createUser)
     {
         okHttpClient = new OkHttpClient();
-        this.userRepository = userRepository;
-        this.userService = userService;
+        this.fetchUserFromUsername = fetchUserFromUsername;
+        this.createUser = createUser;
     }
 
-    public User getUser(String accessToken) throws InvalidAuthTokenException, CreateUserException
+    public AuthenticatedUser getAUthenticatedUser(String accessToken)
+            throws InvalidAuthTokenException, InvalidUserFieldException, CreateUserException
     {
         UserData userData = getFacebookUserData(accessToken);
         if (userData == null)
@@ -46,22 +50,31 @@ public class FacebookService
             throw new InvalidAuthTokenException();
         }
 
-        User user = userRepository.fetch(FACEBOOK_USERNAME_TYPE, userData.id);
+        FetchUserFromUsername.Request fetchUserRequest = new FetchUserFromUsername.Request();
+        fetchUserRequest.usernameType = FACEBOOK_USERNAME_TYPE;
+        fetchUserRequest.username = userData.id;
+        FetchUserFromUsername.Response fetchUserResponse = fetchUserFromUsername.execute(fetchUserRequest);
+
+        User user = fetchUserResponse.user;
+        boolean isNew = false;
+
         if (user == null)
         {
             /* New User */
-            user = new User();
-            user.setFirstname(userData.firstname);
-            user.setLastname(userData.lastname);
-            user.setEmail(userData.email);
-            user.setGender(userData.gender);
-            user.setUsernameType(FACEBOOK_USERNAME_TYPE);
-            user.setUsername(userData.id);
+            CreateUser.Request request = new CreateUser.Request();
+            request.firstname = userData.firstname;
+            request.lastname = userData.lastname;
+            request.email = userData.email;
+            request.gender = userData.gender;
+            request.usernameType = FACEBOOK_USERNAME_TYPE;
+            request.username = userData.id;
 
-            user = userService.register(user);
+            CreateUser.Response response = createUser.execute(request);
+            user = response.user;
+            isNew = true;
         }
 
-        return user;
+        return new AuthenticatedUser(user, isNew);
     }
 
     private UserData getFacebookUserData(String accessToken)
