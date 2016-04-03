@@ -32,11 +32,12 @@ public class PostgresZoneRepository implements ZoneRepository
             while (resultSet.next())
             {
                 String zoneCode = resultSet.getString("zone_code");
+                String name = resultSet.getString("name");
                 double latitude = resultSet.getDouble("centroid_latitude");
                 double longitude = resultSet.getDouble("centroid_longitude");
                 double range = resultSet.getDouble("range");
 
-                locationZones.add(new LocationZone(zoneCode, latitude, longitude, range));
+                locationZones.add(new LocationZone(zoneCode, name, latitude, longitude, range));
             }
 
             resultSet.close();

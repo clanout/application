@@ -57,7 +57,7 @@ public class CreateSession
         switch (authMethod)
         {
             case FACEBOOK:
-                user = facebookService.getAUthenticatedUser(request.authToken);
+                user = facebookService.getAuthenticatedUser(request.authToken);
                 break;
 
             default:

@@ -5,6 +5,7 @@ import com.clanout.application.library.async.AsyncPool;
 import com.clanout.application.module.auth.data.postgres.PostgresTokenRepository;
 import com.clanout.application.module.auth.domain.repository.TokenRepository;
 import com.clanout.application.module.user.context.UserContext;
+import com.clanout.application.module.user.domain.use_case.AddFriends;
 import com.clanout.application.module.user.domain.use_case.CreateUser;
 import com.clanout.application.module.user.domain.use_case.FetchUserFromUsername;
 import dagger.Module;
@@ -41,6 +42,13 @@ class AuthDependencyProvider
     public FetchUserFromUsername provideFetchUserFromUsername()
     {
         return userContext.fetchUserFromUsername();
+    }
+
+    @Provides
+    @ModuleScope
+    public AddFriends provideAddFriends()
+    {
+        return userContext.addFriends();
     }
 
     @Provides

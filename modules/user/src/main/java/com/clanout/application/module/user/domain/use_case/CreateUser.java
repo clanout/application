@@ -31,12 +31,12 @@ public class CreateUser
     {
         if (StringUtils.isNullOrEmpty(request.firstname))
         {
-            throw new InvalidUserFieldException("first_name");
+            throw new InvalidUserFieldException("first name");
         }
 
         if (StringUtils.isNullOrEmpty(request.lastname))
         {
-            throw new InvalidUserFieldException("last_name");
+            throw new InvalidUserFieldException("last name");
         }
 
         if (StringUtils.isNullOrEmpty(request.gender))
@@ -51,7 +51,7 @@ public class CreateUser
 
         if (StringUtils.isNullOrEmpty(request.usernameType))
         {
-            throw new InvalidUserFieldException("username_type");
+            throw new InvalidUserFieldException("username type");
         }
 
         if (StringUtils.isNullOrEmpty(request.locationZone))

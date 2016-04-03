@@ -15,6 +15,7 @@
 
     <properties>
         <gson.version>2.6.2</gson.version>
+        <libphonenumber.version>7.0.10</libphonenumber.version>
     </properties>
 
     <dependencies>
@@ -22,6 +23,12 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>${gson.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.googlecode.libphonenumber</groupId>
+            <artifactId>libphonenumber</artifactId>
+            <version>${libphonenumber.version}</version>
         </dependency>
     </dependencies>
 </project>

@@ -27,6 +27,7 @@ public class GetZone
 
         Response response = new Response();
         response.zoneCode = locationZone.getZoneCode();
+        response.zoneName = locationZone.getName();
         return response;
     }
 
@@ -39,5 +40,6 @@ public class GetZone
     public static class Response
     {
         public String zoneCode;
+        public String zoneName;
     }
 }

@@ -1,4 +1,3 @@
 SELECT *
 FROM users
-WHERE username_type = ?
-      AND username = ?
+WHERE user_id = ?

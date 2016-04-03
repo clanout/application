@@ -2,16 +2,18 @@ package com.clanout.application.module.location.domain.model;
 
 public class LocationZone
 {
-    public static final LocationZone UNKNOWN_ZONE = new LocationZone("UNKNOWN_ZONE", 0.0, 0.0, 0.0);
+    public static final LocationZone UNKNOWN_ZONE = new LocationZone("UNKNOWN_ZONE", "Unknown Zone", 0.0, 0.0, 0.0);
 
     private final String zoneCode;
+    private final String name;
     private final double centroidLatitude;
     private final double centroidLongitude;
     private final double range;
 
-    public LocationZone(String zoneCode, double centroidLatitude, double centroidLongitude, double range)
+    public LocationZone(String zoneCode, String name, double centroidLatitude, double centroidLongitude, double range)
     {
         this.zoneCode = zoneCode;
+        this.name = name;
         this.centroidLatitude = centroidLatitude;
         this.centroidLongitude = centroidLongitude;
         this.range = range;
@@ -20,6 +22,11 @@ public class LocationZone
     public String getZoneCode()
     {
         return zoneCode;
+    }
+
+    public String getName()
+    {
+        return name;
     }
 
     public double getCentroidLatitude()
@@ -40,7 +47,7 @@ public class LocationZone
     @Override
     public String toString()
     {
-        return "[" + zoneCode + " : (" + centroidLatitude + ", " + centroidLongitude + ") : " + range + "]";
+        return "[" + zoneCode + " : " + name + " : (" + centroidLatitude + ", " + centroidLongitude + ") : " + range + "]";
     }
 
     @Override

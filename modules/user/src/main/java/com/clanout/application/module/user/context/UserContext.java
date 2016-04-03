@@ -2,8 +2,7 @@ package com.clanout.application.module.user.context;
 
 import com.clanout.application.framework.module.Context;
 import com.clanout.application.module.location.context.LocationContext;
-import com.clanout.application.module.user.domain.use_case.CreateUser;
-import com.clanout.application.module.user.domain.use_case.FetchUserFromUsername;
+import com.clanout.application.module.user.domain.use_case.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -37,8 +36,38 @@ public class UserContext implements Context
         return injector.createUser();
     }
 
+    public FetchUser fetchUser()
+    {
+        return injector.fetchUser();
+    }
+
     public FetchUserFromUsername fetchUserFromUsername()
     {
         return injector.fetchUserFromUsername();
+    }
+
+    public UpdateLocation updateLocation()
+    {
+        return injector.updateLocation();
+    }
+
+    public UpdateMobile updateMobile()
+    {
+        return injector.updateMobile();
+    }
+
+    public AddFriends addFriends()
+    {
+        return injector.addFriends();
+    }
+
+    public FetchFriends fetchFriends()
+    {
+        return injector.fetchFriends();
+    }
+
+    public BlockFriends blockFriends()
+    {
+        return injector.blockFriends();
     }
 }
