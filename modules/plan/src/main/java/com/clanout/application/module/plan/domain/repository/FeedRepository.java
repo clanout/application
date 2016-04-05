@@ -9,11 +9,13 @@ import java.time.OffsetDateTime;
 
 public interface FeedRepository
 {
-    void add(String userId, Plan plan, boolean markFeedUpdated);
+    void add(String userId, Plan plan);
 
     void remove(String userId, String planId);
 
     Plan fetch(String userId, String planId)throws PlanNotFoundException;
 
     Feed fetch(String userId, OffsetDateTime lastUpdated) throws FeedNotFoundException;
+
+    void markFeedUpdated(String userId);
 }

@@ -1,9 +1,7 @@
 package com.clanout.application.module.plan.context;
 
 import com.clanout.application.framework.di.ModuleScope;
-import com.clanout.application.module.plan.domain.use_case.CreatePlan;
-import com.clanout.application.module.plan.domain.use_case.FetchFeed;
-import com.clanout.application.module.plan.domain.use_case.FetchPlan;
+import com.clanout.application.module.plan.domain.use_case.*;
 import dagger.Component;
 
 @ModuleScope
@@ -15,4 +13,8 @@ interface PlanDependencyInjector
     FetchPlan fetchPlan();
 
     CreatePlan createPlan();
+
+    UpdatePlan updatePlan();
+
+    DeletePlan deletePlan();
 }

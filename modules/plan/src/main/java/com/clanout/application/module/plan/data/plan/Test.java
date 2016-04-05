@@ -82,8 +82,9 @@ public class Test
         plan1 = planRepository.create(plan1);
         plan2 = planRepository.create(plan2);
 
-        feedRepository.add(ADITYA, plan1, true);
-        feedRepository.add(ADITYA, plan2, true);
+        feedRepository.add(ADITYA, plan1);
+        feedRepository.add(ADITYA, plan2);
+        feedRepository.markFeedUpdated(ADITYA);
 
         System.out.println(GSON.toJson(plan1));
         System.out.println(GSON.toJson(plan2));

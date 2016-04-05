@@ -29,7 +29,7 @@ public class FeedRepositoryImpl implements FeedRepository
     private static final String MONGO_PLAN_COLLECTION = "plans";
 
     @Override
-    public void add(String userId, Plan plan, boolean markFeedUpdated)
+    public void add(String userId, Plan plan)
     {
         try
         {
@@ -55,20 +55,7 @@ public class FeedRepositoryImpl implements FeedRepository
             /* Insert Plan Entry */
             updateObject = new Document();
             updateObject.put("$addToSet", new Document("plans", planEntry));
-
-            if (markFeedUpdated)
-            {
-                updateObject.put("$set", new Document("updated_at", MongoDateTimeMapper.map(OffsetDateTime.now())));
-            }
             collection.updateOne(new Document("user_id", userId), updateObject, updateOptions);
-
-            if(!markFeedUpdated)
-            {
-                Document missingUpdateTimeCondition = new Document();
-                missingUpdateTimeCondition.put("user_id", userId);
-                missingUpdateTimeCondition.put("updated_at",new Document("$exists", false));
-                collection.updateOne(missingUpdateTimeCondition, new Document("$set", new Document("updated_at", MongoDateTimeMapper.map(OffsetDateTime.now()))));
-            }
         }
         catch (Exception e)
         {
@@ -86,7 +73,6 @@ public class FeedRepositoryImpl implements FeedRepository
 
             Document updateObject = new Document();
             updateObject.put("$pull", new Document("plans", new Document("plan_id", planId)));
-            updateObject.put("$set", new Document("updated_at", MongoDateTimeMapper.map(OffsetDateTime.now())));
             collection.updateOne(new BasicDBObject("user_id", userId), updateObject);
         }
         catch (Exception e)
@@ -208,6 +194,24 @@ public class FeedRepositoryImpl implements FeedRepository
             e.printStackTrace();
             LOG.error("Unable to read feed [" + e.getMessage() + "]");
             throw new RuntimeException();
+        }
+    }
+
+    @Override
+    public void markFeedUpdated(String userId)
+    {
+        try
+        {
+            MongoDatabase database = MongoDataSource.getInstance().getDatabase();
+            MongoCollection<Document> collection = database.getCollection(MONGO_USER_FEED_COLLECTION);
+
+            Document updateObject = new Document();
+            updateObject.put("$set", new Document("updated_at", MongoDateTimeMapper.map(OffsetDateTime.now())));
+            collection.updateOne(new BasicDBObject("user_id", userId), updateObject);
+        }
+        catch (Exception e)
+        {
+            LOG.error("Unable to update feed updated_at time [" + e.getMessage() + "]");
         }
     }
 }

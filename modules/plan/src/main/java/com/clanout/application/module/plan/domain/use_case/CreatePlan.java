@@ -12,7 +12,10 @@ import com.clanout.application.module.plan.domain.repository.PlanRepository;
 import javax.inject.Inject;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 @ModuleScope
 public class CreatePlan
@@ -122,9 +125,9 @@ public class CreatePlan
         plan.setInviter(new ArrayList<>());
         plan.setInvitee(new ArrayList<>());
 
-        feedRepository.add(request.userId, plan, false);
+        feedRepository.add(request.userId, plan);
 
-        // TODO: Fan Out
+        // TODO: (Create) Fan Out, Notification
 
         Response response = new Response();
         response.planId = plan.getId();

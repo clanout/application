@@ -3,9 +3,7 @@ package com.clanout.application.module.plan.context;
 import com.clanout.application.framework.module.Context;
 import com.clanout.application.module.location.context.LocationContext;
 import com.clanout.application.module.plan.domain.observer.PlanModuleSubscriptions;
-import com.clanout.application.module.plan.domain.use_case.CreatePlan;
-import com.clanout.application.module.plan.domain.use_case.FetchFeed;
-import com.clanout.application.module.plan.domain.use_case.FetchPlan;
+import com.clanout.application.module.plan.domain.use_case.*;
 import com.clanout.application.module.user.context.UserContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -55,5 +53,15 @@ public class PlanContext implements Context
     public CreatePlan createPlan()
     {
         return injector.createPlan();
+    }
+
+    public UpdatePlan updatePlan()
+    {
+        return injector.updatePlan();
+    }
+
+    public DeletePlan deletePlan()
+    {
+        return injector.deletePlan();
     }
 }
