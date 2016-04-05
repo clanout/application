@@ -18,6 +18,7 @@
         <module>user</module>
         <module>location</module>
         <module>image</module>
+        <module>plan</module>
     </modules>
 
     <dependencies>

@@ -43,6 +43,12 @@
 
         <dependency>
             <groupId>com.clanout.application</groupId>
+            <artifactId>module-plan</artifactId>
+            <version>${clanout.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.clanout.application</groupId>
             <artifactId>module-image</artifactId>
             <version>${clanout.version}</version>
         </dependency>
@@ -69,6 +75,12 @@
         <dependency>
             <groupId>com.clanout.application</groupId>
             <artifactId>lib-redis</artifactId>
+            <version>${clanout.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.clanout.application</groupId>
+            <artifactId>lib-mongo</artifactId>
             <version>${clanout.version}</version>
         </dependency>
 

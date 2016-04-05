@@ -14,7 +14,8 @@ public class FetchProfileImage
     private PersistentImageRepository persistentImageRepository;
 
     @Inject
-    public FetchProfileImage(CachedImageRepository cachedImageRepository, PersistentImageRepository persistentImageRepository)
+    public FetchProfileImage(CachedImageRepository cachedImageRepository,
+                             PersistentImageRepository persistentImageRepository)
     {
         this.cachedImageRepository = cachedImageRepository;
         this.persistentImageRepository = persistentImageRepository;

@@ -1,7 +1,7 @@
 package com.clanout.application.module.user.domain.use_case;
 
 import com.clanout.application.framework.di.ModuleScope;
-import com.clanout.application.module.user.domain.exception.InvalidUserFieldException;
+import com.clanout.application.framework.module.InvalidFieldException;
 import com.clanout.application.module.user.domain.model.User;
 import com.clanout.application.module.user.domain.repository.UserRepository;
 
@@ -18,12 +18,12 @@ public class FetchUser
         this.userRepository = userRepository;
     }
 
-    public Response execute(Request request) throws InvalidUserFieldException
+    public Response execute(Request request) throws InvalidFieldException
     {
         User user = userRepository.fetch(request.userId);
         if (user == null)
         {
-            throw new InvalidUserFieldException("user id");
+            throw new InvalidFieldException("user id");
         }
 
         Response response = new Response();

@@ -1,11 +1,11 @@
 package com.clanout.application.module.auth.domain.service;
 
 import com.clanout.application.framework.di.ModuleScope;
+import com.clanout.application.framework.module.InvalidFieldException;
 import com.clanout.application.library.util.gson.GsonProvider;
 import com.clanout.application.module.auth.domain.exception.InvalidAuthTokenException;
 import com.clanout.application.module.auth.domain.model.AuthenticatedUser;
 import com.clanout.application.module.user.domain.exception.CreateUserException;
-import com.clanout.application.module.user.domain.exception.InvalidUserFieldException;
 import com.clanout.application.module.user.domain.model.User;
 import com.clanout.application.module.user.domain.use_case.AddFriends;
 import com.clanout.application.module.user.domain.use_case.CreateUser;
@@ -19,7 +19,6 @@ import org.apache.logging.log4j.Logger;
 
 import javax.inject.Inject;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @ModuleScope
@@ -51,7 +50,7 @@ public class FacebookService
     }
 
     public AuthenticatedUser getAuthenticatedUser(String accessToken)
-            throws InvalidAuthTokenException, InvalidUserFieldException, CreateUserException
+            throws InvalidAuthTokenException, InvalidFieldException, CreateUserException
     {
         UserData userData = getFacebookUserData(accessToken);
         if (userData == null)

@@ -14,7 +14,7 @@
     <name>clanout-application-module-user</name>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <okhttp.version>2.7.5</okhttp.version>
     </properties>
 
     <dependencies>
@@ -30,6 +30,13 @@
             <groupId>com.clanout.application</groupId>
             <artifactId>lib-postgres</artifactId>
             <version>${clanout.version}</version>
+        </dependency>
+
+        <!-- Http Client -->
+        <dependency>
+            <groupId>com.squareup.okhttp</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>${okhttp.version}</version>
         </dependency>
 
     </dependencies>

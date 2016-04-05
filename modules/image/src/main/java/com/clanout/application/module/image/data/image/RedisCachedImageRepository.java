@@ -11,6 +11,7 @@ public class RedisCachedImageRepository implements CachedImageRepository
     private static Logger LOG = LogManager.getRootLogger();
 
     private static final String PROFILE_IMAGE_KEY_PREFIX = "profile_image:";
+    private static final String COVER_IMAGE_KEY_PREFIX = "cover_image:";
 
     @Override
     public String fetchProfileImageUrl(String userId)

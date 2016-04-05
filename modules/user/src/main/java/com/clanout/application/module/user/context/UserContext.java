@@ -2,6 +2,8 @@ package com.clanout.application.module.user.context;
 
 import com.clanout.application.framework.module.Context;
 import com.clanout.application.module.location.context.LocationContext;
+import com.clanout.application.module.user.domain.observer.LocationUpdateObserver;
+import com.clanout.application.module.user.domain.observer.UserModuleObservers;
 import com.clanout.application.module.user.domain.use_case.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,14 +16,19 @@ public class UserContext implements Context
 
     private LocationContext locationContext;
 
+    /* Observers */
+    UserModuleObservers observers;
+
     public UserContext(LocationContext locationContext)
     {
         LOG.debug("[UserContext initialized]");
         this.locationContext = locationContext;
         injector = DaggerUserDependencyInjector
                 .builder()
-                .userDependencyProvider(new UserDependencyProvider(locationContext))
+                .userDependencyProvider(new UserDependencyProvider(this, locationContext))
                 .build();
+
+        observers = new UserModuleObservers();
     }
 
     @Override
@@ -69,5 +76,10 @@ public class UserContext implements Context
     public BlockFriends blockFriends()
     {
         return injector.blockFriends();
+    }
+
+    public void registerLocationUpdateObserver(LocationUpdateObserver observer)
+    {
+        observers.registerLocationUpdateObserver(observer);
     }
 }

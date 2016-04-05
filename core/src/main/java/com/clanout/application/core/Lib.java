@@ -5,5 +5,6 @@ public enum Lib
     UTIL,
     ASYNC,
     POSTGRES,
-    REDIS
+    REDIS,
+    MONGO
 }

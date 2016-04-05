@@ -6,5 +6,6 @@ public enum Module
     LOCATION,
     USER,
     AUTH,
-    IMAGE
+    IMAGE,
+    PLAN
 }

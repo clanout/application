@@ -1,8 +1,8 @@
 package com.clanout.application.module.user.domain.use_case;
 
 import com.clanout.application.framework.di.ModuleScope;
+import com.clanout.application.framework.module.InvalidFieldException;
 import com.clanout.application.library.util.validation.PhoneValidator;
-import com.clanout.application.module.user.domain.exception.InvalidUserFieldException;
 import com.clanout.application.module.user.domain.repository.UserRepository;
 
 import javax.inject.Inject;
@@ -18,11 +18,11 @@ public class UpdateMobile
         this.userRepository = userRepository;
     }
 
-    public void execute(Request request) throws InvalidUserFieldException
+    public void execute(Request request) throws InvalidFieldException
     {
         if (!PhoneValidator.isValid(request.mobileNumber))
         {
-            throw new InvalidUserFieldException("mobile number");
+            throw new InvalidFieldException("mobile number");
         }
 
         userRepository.updateMobileNumber(request.userId, request.mobileNumber);

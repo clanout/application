@@ -1,10 +1,10 @@
-package com.clanout.application.module.user.domain.exception;
+package com.clanout.application.framework.module;
 
-public class InvalidUserFieldException extends Exception
+public class InvalidFieldException extends Exception
 {
     private String fieldName;
 
-    public InvalidUserFieldException(String fieldName)
+    public InvalidFieldException(String fieldName)
     {
         this.fieldName = fieldName;
     }

@@ -1,8 +1,8 @@
 package com.clanout.application.module.user.domain.use_case;
 
 import com.clanout.application.framework.di.ModuleScope;
+import com.clanout.application.framework.module.InvalidFieldException;
 import com.clanout.application.library.util.common.StringUtils;
-import com.clanout.application.module.user.domain.exception.InvalidUserFieldException;
 import com.clanout.application.module.user.domain.repository.UserRepository;
 
 import javax.inject.Inject;
@@ -19,16 +19,16 @@ public class AddFriends
         this.userRepository = userRepository;
     }
 
-    public void execute(Request request) throws InvalidUserFieldException
+    public void execute(Request request) throws InvalidFieldException
     {
         if (StringUtils.isNullOrEmpty(request.friendUsernameType))
         {
-            throw new InvalidUserFieldException("friends username type");
+            throw new InvalidFieldException("friends username type");
         }
 
         if (request.usernames == null)
         {
-            throw new InvalidUserFieldException("friends");
+            throw new InvalidFieldException("friends");
         }
 
         if (!request.usernames.isEmpty())

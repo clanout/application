@@ -4,6 +4,7 @@ import com.clanout.application.framework.di.ModuleScope;
 import com.clanout.application.module.location.context.LocationContext;
 import com.clanout.application.module.location.domain.use_case.GetZone;
 import com.clanout.application.module.user.data.user.PostgresUserRepository;
+import com.clanout.application.module.user.domain.observer.UserModuleObservers;
 import com.clanout.application.module.user.domain.repository.UserRepository;
 import dagger.Module;
 import dagger.Provides;
@@ -11,10 +12,12 @@ import dagger.Provides;
 @Module
 class UserDependencyProvider
 {
+    private UserContext userContext;
     private LocationContext locationContext;
 
-    public UserDependencyProvider(LocationContext locationContext)
+    public UserDependencyProvider(UserContext userContext, LocationContext locationContext)
     {
+        this.userContext = userContext;
         this.locationContext = locationContext;
     }
 
@@ -30,5 +33,12 @@ class UserDependencyProvider
     public UserRepository provideUserRepository()
     {
         return new PostgresUserRepository();
+    }
+
+    @Provides
+    @ModuleScope
+    public UserModuleObservers provideUserModuleObservers()
+    {
+        return userContext.observers;
     }
 }

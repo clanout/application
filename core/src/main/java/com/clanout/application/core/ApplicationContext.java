@@ -4,12 +4,14 @@ import com.clanout.application.framework.conf.ConfManager;
 import com.clanout.application.framework.lib.Library;
 import com.clanout.application.framework.module.Context;
 import com.clanout.application.library.async.AsyncLibrary;
+import com.clanout.application.library.mongo.MongoLibrary;
 import com.clanout.application.library.postgres.PostgresLibrary;
 import com.clanout.application.library.redis.RedisLibrary;
 import com.clanout.application.library.util.UtilLibrary;
 import com.clanout.application.module.auth.context.AuthContext;
 import com.clanout.application.module.image.context.ImageContext;
 import com.clanout.application.module.location.context.LocationContext;
+import com.clanout.application.module.plan.context.PlanContext;
 import com.clanout.application.module.user.context.UserContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -74,6 +76,9 @@ public class ApplicationContext
 
         ImageContext imageContext = new ImageContext(userContext);
         modules.put(Module.IMAGE, imageContext);
+
+        PlanContext planContext = new PlanContext(locationContext, userContext);
+        modules.put(Module.PLAN, planContext);
     }
 
     private void initLibs(ExecutorService backgroundPool) throws Exception
@@ -91,5 +96,8 @@ public class ApplicationContext
 
         RedisLibrary redisLibrary = new RedisLibrary();
         libs.put(Lib.REDIS, redisLibrary);
+
+        MongoLibrary mongoLibrary = new MongoLibrary();
+        libs.put(Lib.MONGO, mongoLibrary);
     }
 }

@@ -1,11 +1,10 @@
 package com.clanout.application.module.user.domain.use_case;
 
 import com.clanout.application.framework.di.ModuleScope;
+import com.clanout.application.framework.module.InvalidFieldException;
 import com.clanout.application.library.util.common.StringUtils;
-import com.clanout.application.library.util.gson.GsonProvider;
 import com.clanout.application.module.location.domain.model.LocationZone;
 import com.clanout.application.module.user.domain.exception.CreateUserException;
-import com.clanout.application.module.user.domain.exception.InvalidUserFieldException;
 import com.clanout.application.module.user.domain.model.User;
 import com.clanout.application.module.user.domain.repository.UserRepository;
 import com.clanout.application.module.user.domain.service.UserService;
@@ -27,31 +26,31 @@ public class CreateUser
         this.userRepository = userRepository;
     }
 
-    public Response execute(Request request) throws InvalidUserFieldException, CreateUserException
+    public Response execute(Request request) throws InvalidFieldException, CreateUserException
     {
         if (StringUtils.isNullOrEmpty(request.firstname))
         {
-            throw new InvalidUserFieldException("first name");
+            throw new InvalidFieldException("first name");
         }
 
         if (StringUtils.isNullOrEmpty(request.lastname))
         {
-            throw new InvalidUserFieldException("last name");
+            throw new InvalidFieldException("last name");
         }
 
         if (StringUtils.isNullOrEmpty(request.gender))
         {
-            throw new InvalidUserFieldException("gender");
+            throw new InvalidFieldException("gender");
         }
 
         if (StringUtils.isNullOrEmpty(request.username))
         {
-            throw new InvalidUserFieldException("username");
+            throw new InvalidFieldException("username");
         }
 
         if (StringUtils.isNullOrEmpty(request.usernameType))
         {
-            throw new InvalidUserFieldException("username type");
+            throw new InvalidFieldException("username type");
         }
 
         if (StringUtils.isNullOrEmpty(request.locationZone))
