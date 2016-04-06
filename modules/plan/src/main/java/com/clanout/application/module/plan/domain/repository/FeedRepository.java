@@ -4,6 +4,7 @@ import com.clanout.application.module.plan.domain.exception.FeedNotFoundExceptio
 import com.clanout.application.module.plan.domain.exception.PlanNotFoundException;
 import com.clanout.application.module.plan.domain.model.Feed;
 import com.clanout.application.module.plan.domain.model.Plan;
+import com.clanout.application.module.plan.domain.model.Rsvp;
 
 import java.time.OffsetDateTime;
 
@@ -18,4 +19,6 @@ public interface FeedRepository
     Feed fetch(String userId, OffsetDateTime lastUpdated) throws FeedNotFoundException;
 
     void markFeedUpdated(String userId);
+
+    boolean updateRsvp(String userId, String planId, Rsvp rsvp) throws PlanNotFoundException;
 }

@@ -8,20 +8,27 @@ import com.clanout.application.module.plan.domain.exception.PlanNotFoundExceptio
 import com.clanout.application.module.plan.domain.model.Plan;
 import com.clanout.application.module.plan.domain.repository.FeedRepository;
 import com.clanout.application.module.plan.domain.repository.PlanRepository;
+import com.clanout.application.module.plan.domain.service.FanoutService;
 
 import javax.inject.Inject;
+import java.util.concurrent.ExecutorService;
 
 @ModuleScope
 public class DeletePlan
 {
+    private ExecutorService backgroundPool;
     private PlanRepository planRepository;
     private FeedRepository feedRepository;
+    private FanoutService fanoutService;
 
     @Inject
-    public DeletePlan(PlanRepository planRepository, FeedRepository feedRepository)
+    public DeletePlan(ExecutorService backgroundPool, PlanRepository planRepository,
+                      FeedRepository feedRepository, FanoutService fanoutService)
     {
+        this.backgroundPool = backgroundPool;
         this.planRepository = planRepository;
         this.feedRepository = feedRepository;
+        this.fanoutService = fanoutService;
     }
 
     public void execute(Request request)
@@ -29,20 +36,23 @@ public class DeletePlan
     {
         if (StringUtils.isNullOrEmpty(request.planId))
         {
-            throw new InvalidFieldException("plan in");
+            throw new InvalidFieldException("plan id");
         }
 
         Plan plan = feedRepository.fetch(request.userId, request.planId);
 
-        if(!plan.getCreatorId().equals(request.userId))
+        if (!plan.getCreatorId().equals(request.userId))
         {
             throw new DeletePlanPermissionException();
         }
 
+        /* Fan Out */
+        backgroundPool.execute(() -> {
+            fanoutService.onDelete(request.userId, request.planId);
+        });
+
         feedRepository.remove(request.userId, request.planId);
         planRepository.delete(request.planId);
-
-        //TODO : (Delete) Fan Out, Notification
     }
 
     public static class Request

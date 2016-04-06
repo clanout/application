@@ -8,6 +8,7 @@ import com.clanout.application.module.location.domain.use_case.GetZone;
 import com.clanout.application.module.plan.domain.model.*;
 import com.clanout.application.module.plan.domain.repository.FeedRepository;
 import com.clanout.application.module.plan.domain.repository.PlanRepository;
+import com.clanout.application.module.plan.domain.service.FanoutService;
 
 import javax.inject.Inject;
 import java.time.OffsetDateTime;
@@ -16,20 +17,26 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 
 @ModuleScope
 public class CreatePlan
 {
+    private ExecutorService backgroundPool;
     private GetZone getZone;
     private PlanRepository planRepository;
     private FeedRepository feedRepository;
+    private FanoutService fanoutService;
 
     @Inject
-    public CreatePlan(GetZone getZone, PlanRepository planRepository, FeedRepository feedRepository)
+    public CreatePlan(ExecutorService backgroundPool, GetZone getZone,
+                      PlanRepository planRepository, FeedRepository feedRepository, FanoutService fanoutService)
     {
+        this.backgroundPool = backgroundPool;
         this.getZone = getZone;
         this.planRepository = planRepository;
         this.feedRepository = feedRepository;
+        this.fanoutService = fanoutService;
     }
 
     public Response execute(Request request) throws InvalidFieldException
@@ -127,7 +134,11 @@ public class CreatePlan
 
         feedRepository.add(request.userId, plan);
 
-        // TODO: (Create) Fan Out, Notification
+        /* Fan Out */
+        final Plan finalPlan = plan;
+        backgroundPool.execute(() -> {
+            fanoutService.onCreate(finalPlan);
+        });
 
         Response response = new Response();
         response.planId = plan.getId();

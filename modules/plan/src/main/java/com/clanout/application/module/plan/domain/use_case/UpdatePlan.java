@@ -10,22 +10,29 @@ import com.clanout.application.module.plan.domain.model.Location;
 import com.clanout.application.module.plan.domain.model.Plan;
 import com.clanout.application.module.plan.domain.repository.FeedRepository;
 import com.clanout.application.module.plan.domain.repository.PlanRepository;
+import com.clanout.application.module.plan.domain.service.FanoutService;
 
 import javax.inject.Inject;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 @ModuleScope
 public class UpdatePlan
 {
+    private ExecutorService backgroundPool;
     private PlanRepository planRepository;
     private FeedRepository feedRepository;
+    private FanoutService fanoutService;
 
     @Inject
-    public UpdatePlan(PlanRepository planRepository, FeedRepository feedRepository)
+    public UpdatePlan(ExecutorService backgroundPool, PlanRepository planRepository,
+                      FeedRepository feedRepository, FanoutService fanoutService)
     {
+        this.backgroundPool = backgroundPool;
         this.planRepository = planRepository;
         this.feedRepository = feedRepository;
+        this.fanoutService = fanoutService;
     }
 
     public void execute(Request request) throws PlanNotFoundException,
@@ -33,7 +40,7 @@ public class UpdatePlan
     {
         if (StringUtils.isNullOrEmpty(request.planId))
         {
-            throw new InvalidFieldException("plan in");
+            throw new InvalidFieldException("plan id");
         }
 
         Plan plan = feedRepository.fetch(request.userId, request.planId);
@@ -87,7 +94,13 @@ public class UpdatePlan
         planRepository.update(request.planId, request.description,
                               request.startTime, request.endTime, location);
 
-        //TODO : (Update) Fan Out, Notification
+
+        /* Fan Out */
+        final Location finalLocation = location;
+        backgroundPool.execute(() -> {
+            fanoutService.onUpdate(request.planId, request.description,
+                                   request.startTime, request.endTime, finalLocation);
+        });
     }
 
     public static class Request

@@ -6,6 +6,7 @@ import com.clanout.application.module.plan.domain.exception.FeedNotFoundExceptio
 import com.clanout.application.module.plan.domain.exception.PlanNotFoundException;
 import com.clanout.application.module.plan.domain.model.Feed;
 import com.clanout.application.module.plan.domain.model.Plan;
+import com.clanout.application.module.plan.domain.model.Rsvp;
 import com.clanout.application.module.plan.domain.repository.FeedRepository;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
@@ -212,6 +213,68 @@ public class FeedRepositoryImpl implements FeedRepository
         catch (Exception e)
         {
             LOG.error("Unable to update feed updated_at time [" + e.getMessage() + "]");
+        }
+    }
+
+    @Override
+    public boolean updateRsvp(String userId, String planId, Rsvp rsvp) throws PlanNotFoundException
+    {
+        try
+        {
+            MongoDatabase database = MongoDataSource.getInstance().getDatabase();
+            MongoCollection<Document> feedCollection = database.getCollection(MONGO_USER_FEED_COLLECTION);
+
+            Document planContext = null;
+            try
+            {
+                Document filteredFeed = feedCollection
+                        .find(new Document("user_id", userId))
+                        .projection(Projections.elemMatch("plans", new Document("plan_id", planId)))
+                        .first();
+
+                planContext = ((ArrayList<Document>) filteredFeed.get("plans")).get(0);
+                if (planContext == null)
+                {
+                    throw new NullPointerException();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new PlanNotFoundException();
+            }
+
+            String oldRsvp = planContext.getString("rsvp");
+            if (oldRsvp.equals(rsvp.name()))
+            {
+                return false;
+            }
+
+            planContext.put("rsvp", rsvp.name());
+            planContext.put("status", "");
+
+            UpdateOptions updateOptions = new UpdateOptions();
+            updateOptions.upsert(true);
+
+            /* Remove Plan Entry (if exists) */
+            Document updateObject = new Document();
+            updateObject.put("$pull", new Document("plans", new Document("plan_id", planId)));
+            feedCollection.updateOne(new BasicDBObject("user_id", userId), updateObject, updateOptions);
+
+            /* Insert Plan Entry */
+            updateObject = new Document();
+            updateObject.put("$addToSet", new Document("plans", planContext));
+            feedCollection.updateOne(new Document("user_id", userId), updateObject, updateOptions);
+
+            return true;
+        }
+        catch (PlanNotFoundException e)
+        {
+            throw e;
+        }
+        catch (Exception e)
+        {
+            LOG.error("Unable to update rsvp [" + e.getMessage() + "]");
+            throw new RuntimeException();
         }
     }
 }

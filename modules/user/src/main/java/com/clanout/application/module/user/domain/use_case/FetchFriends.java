@@ -28,7 +28,7 @@ public class FetchFriends
         {
             friends = friends
                     .stream()
-                    .filter(friend -> friend.getLocationZone().equalsIgnoreCase(locationZone))
+                    .filter(friend -> friend.getLocationZone().equals(locationZone))
                     .collect(Collectors.toList());
         }
 

@@ -17,4 +17,6 @@ interface PlanDependencyInjector
     UpdatePlan updatePlan();
 
     DeletePlan deletePlan();
+
+    UpdateRsvp updateRsvp();
 }

@@ -64,4 +64,9 @@ public class PlanContext implements Context
     {
         return injector.deletePlan();
     }
+
+    public UpdateRsvp updateRsvp()
+    {
+        return injector.updateRsvp();
+    }
 }

@@ -37,13 +37,24 @@ public class Test
         PostgresDataSource.getInstance().init();
         MongoDataSource.getInstance().init();
 
-        update();
-//        feed();
+//        update();
+        feed();
 //        createPlans();
+//        updateRsvp();
 
 
         MongoDataSource.getInstance().close();
         PostgresDataSource.getInstance().close();
+    }
+
+    public static void updateRsvp() throws PlanNotFoundException
+    {
+        String planId = "5703daab156407669fa8f976";
+
+        PlanRepository planRepository = new PlanRepositoryImpl();
+        FeedRepository feedRepository = new FeedRepositoryImpl();
+
+        feedRepository.updateRsvp(ADITYA, planId, Rsvp.YES);
     }
 
     public static void update() throws PlanNotFoundException
@@ -67,8 +78,8 @@ public class Test
     {
         FeedRepository feedRepository = new FeedRepositoryImpl();
 
-        OffsetDateTime lastUpdated = OffsetDateTime.now().minusDays(1);
-        Feed feed = feedRepository.fetch(ADITYA, lastUpdated);
+        OffsetDateTime lastUpdated = OffsetDateTime.now().minusDays(10);
+        Feed feed = feedRepository.fetch(HARSH, lastUpdated);
         System.out.println(GSON.toJson(feed));
     }
 

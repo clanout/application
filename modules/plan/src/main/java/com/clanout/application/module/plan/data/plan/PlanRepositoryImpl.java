@@ -9,8 +9,10 @@ import com.clanout.application.module.plan.domain.model.Attendee;
 import com.clanout.application.module.plan.domain.model.Location;
 import com.clanout.application.module.plan.domain.model.Plan;
 import com.clanout.application.module.plan.domain.repository.PlanRepository;
+import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.UpdateOptions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bson.Document;
@@ -193,6 +195,56 @@ public class PlanRepositoryImpl implements PlanRepository
         {
             LOG.error("Unable to read attendee name [" + e.getSQLState() + " : " + e.getMessage() + "]");
             throw new RuntimeException();
+        }
+    }
+
+    @Override
+    public void addAttendee(String planId, Attendee attendee)
+    {
+        try
+        {
+            MongoDatabase database = MongoDataSource.getInstance().getDatabase();
+            MongoCollection<Document> collection = database.getCollection(MONGO_PLAN_COLLECTION);
+
+            UpdateOptions updateOptions = new UpdateOptions();
+            updateOptions.upsert(true);
+
+            Document attendeeEntry = new Document();
+            attendeeEntry.put("id", attendee.getId());
+            attendeeEntry.put("name", attendee.getName());
+            attendeeEntry.put("status", attendee.getStatus());
+
+            /* Remove Plan Entry (if exists) */
+            Document updateObject = new Document();
+            updateObject.put("$pull", new Document("attendees", new Document("id", attendee.getId())));
+            collection.updateOne(new BasicDBObject("_id", new ObjectId(planId)), updateObject, updateOptions);
+
+            /* Insert Plan Entry */
+            updateObject = new Document();
+            updateObject.put("$addToSet", new Document("attendees", attendeeEntry));
+            collection.updateOne(new Document("_id", new ObjectId(planId)), updateObject, updateOptions);
+        }
+        catch (Exception e)
+        {
+            LOG.error("Unable to add attendee to plan [" + e.getMessage() + "]");
+        }
+    }
+
+    @Override
+    public void deleteAttendee(String planId, String userId)
+    {
+        try
+        {
+            MongoDatabase database = MongoDataSource.getInstance().getDatabase();
+            MongoCollection<Document> collection = database.getCollection(MONGO_PLAN_COLLECTION);
+
+            Document updateObject = new Document();
+            updateObject.put("$pull", new Document("attendees", new Document("id", userId)));
+            collection.updateOne(new BasicDBObject("_id", new ObjectId(planId)), updateObject);
+        }
+        catch (Exception e)
+        {
+            LOG.error("Unable to remove attendee from plan [" + e.getMessage() + "]");
         }
     }
 }

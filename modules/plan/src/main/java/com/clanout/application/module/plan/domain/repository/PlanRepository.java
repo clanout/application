@@ -1,5 +1,6 @@
 package com.clanout.application.module.plan.domain.repository;
 
+import com.clanout.application.module.plan.domain.model.Attendee;
 import com.clanout.application.module.plan.domain.model.Location;
 import com.clanout.application.module.plan.domain.model.Plan;
 
@@ -15,4 +16,8 @@ public interface PlanRepository
                 OffsetDateTime endTime, Location location);
 
     String getAttendeeName(String userId);
+
+    void addAttendee(String planId, Attendee attendee);
+
+    void deleteAttendee(String planId, String userId);
 }
