@@ -15,6 +15,11 @@ public class MongoPlanMapper
     {
         Plan plan = new Plan();
 
+        if (planDocument == null)
+        {
+            throw new NullPointerException();
+        }
+
         plan.setId(planDocument.getObjectId("_id").toHexString());
         plan.setTitle(planDocument.getString("title"));
         plan.setType(Type.valueOf(planDocument.getString("type")));
@@ -53,11 +58,14 @@ public class MongoPlanMapper
         }
         plan.setAttendees(attendees);
 
-        plan.setRsvp(Rsvp.valueOf(planContext.getString("rsvp")));
-        plan.setStatus(planContext.getString("status"));
-        plan.setFriends((ArrayList<String>) planContext.get("friends"));
-        plan.setInviter((ArrayList<String>) planContext.get("inviter"));
-        plan.setInvitee((ArrayList<String>) planContext.get("invitee"));
+        if (planContext != null)
+        {
+            plan.setRsvp(Rsvp.valueOf(planContext.getString("rsvp")));
+            plan.setStatus(planContext.getString("status"));
+            plan.setFriends((ArrayList<String>) planContext.get("friends"));
+            plan.setInviter((ArrayList<String>) planContext.get("inviter"));
+            plan.setInvitee((ArrayList<String>) planContext.get("invitee"));
+        }
 
         return plan;
     }

@@ -39,7 +39,7 @@ public class DeletePlan
             throw new InvalidFieldException("plan id");
         }
 
-        Plan plan = feedRepository.fetch(request.userId, request.planId);
+        Plan plan = planRepository.fetch(request.planId);
 
         if (!plan.getCreatorId().equals(request.userId))
         {

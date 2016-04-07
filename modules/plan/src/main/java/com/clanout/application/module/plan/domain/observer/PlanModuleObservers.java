@@ -4,7 +4,6 @@ import com.clanout.application.module.plan.domain.model.Location;
 import com.clanout.application.module.plan.domain.model.Plan;
 import com.clanout.application.module.plan.domain.model.Rsvp;
 import com.clanout.application.module.plan.domain.service.FanoutService;
-import com.clanout.application.module.plan.domain.use_case.InvitationResponse;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -21,6 +20,7 @@ public class PlanModuleObservers
     private List<ChatUpdateObserver> chatUpdateObservers;
     private List<StatusUpdateObserver> statusUpdateObservers;
     private List<InvitationResponseObserver> invitationResponseObservers;
+    private List<PhoneInviteObserver> phoneInviteObservers;
 
     public PlanModuleObservers()
     {
@@ -32,6 +32,7 @@ public class PlanModuleObservers
         chatUpdateObservers = new ArrayList<>();
         statusUpdateObservers = new ArrayList<>();
         invitationResponseObservers = new ArrayList<>();
+        phoneInviteObservers = new ArrayList<>();
     }
 
     public void registerCreatePlanObserver(CreatePlanObserver observer)
@@ -74,6 +75,11 @@ public class PlanModuleObservers
         invitationResponseObservers.add(observer);
     }
 
+    public void registerPhoneInvitationObserver(PhoneInviteObserver observer)
+    {
+        phoneInviteObservers.add(observer);
+    }
+
     public void onPlanCreated(Plan plan, List<String> affectedUsers)
     {
         for (CreatePlanObserver observer : createPlanObservers)
@@ -90,12 +96,12 @@ public class PlanModuleObservers
         }
     }
 
-    public void onPlanUpdated(String planId, String userId, String description, OffsetDateTime startTime,
+    public void onPlanUpdated(Plan plan, String userId, String description, OffsetDateTime startTime,
                               OffsetDateTime endTime, Location location)
     {
         for (UpdatePlanObserver observer : updatePlanObservers)
         {
-            observer.onPlanUpdated(planId, userId, description, startTime, endTime, location);
+            observer.onPlanUpdated(plan, userId, description, startTime, endTime, location);
         }
     }
 
@@ -137,6 +143,14 @@ public class PlanModuleObservers
         for (InvitationResponseObserver observer : invitationResponseObservers)
         {
             observer.onInvitationResponse(planId, userId, invitationResponse);
+        }
+    }
+
+    public void onPhoneInvite(Plan plan, String userId, List<String> mobileNumbers)
+    {
+        for (PhoneInviteObserver observer : phoneInviteObservers)
+        {
+            observer.onPhoneInvite(plan, userId, mobileNumbers);
         }
     }
 }

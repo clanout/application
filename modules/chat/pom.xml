@@ -11,7 +11,7 @@
     <artifactId>module-chat</artifactId>
     <packaging>jar</packaging>
 
-    <name>module-chat</name>
+    <name>clanout-application-module-chat</name>
 
     <properties>
     </properties>

@@ -8,7 +8,6 @@ import com.clanout.application.module.plan.domain.exception.UpdatePlanPermission
 import com.clanout.application.module.plan.domain.model.Attendee;
 import com.clanout.application.module.plan.domain.model.Location;
 import com.clanout.application.module.plan.domain.model.Plan;
-import com.clanout.application.module.plan.domain.repository.FeedRepository;
 import com.clanout.application.module.plan.domain.repository.PlanRepository;
 import com.clanout.application.module.plan.domain.service.FanoutService;
 
@@ -22,16 +21,14 @@ public class UpdatePlan
 {
     private ExecutorService backgroundPool;
     private PlanRepository planRepository;
-    private FeedRepository feedRepository;
     private FanoutService fanoutService;
 
     @Inject
     public UpdatePlan(ExecutorService backgroundPool, PlanRepository planRepository,
-                      FeedRepository feedRepository, FanoutService fanoutService)
+                      FanoutService fanoutService)
     {
         this.backgroundPool = backgroundPool;
         this.planRepository = planRepository;
-        this.feedRepository = feedRepository;
         this.fanoutService = fanoutService;
     }
 
@@ -43,7 +40,7 @@ public class UpdatePlan
             throw new InvalidFieldException("plan id");
         }
 
-        Plan plan = feedRepository.fetch(request.userId, request.planId);
+        Plan plan = planRepository.fetch(request.planId);
 
         boolean isEditable = false;
         List<Attendee> attendees = plan.getAttendees();
@@ -98,7 +95,7 @@ public class UpdatePlan
         /* Fan Out */
         final Location finalLocation = location;
         backgroundPool.execute(() -> {
-            fanoutService.onUpdate(request.planId, request.userId, request.description,
+            fanoutService.onUpdate(plan, request.userId, request.description,
                                    request.startTime, request.endTime, finalLocation);
         });
     }

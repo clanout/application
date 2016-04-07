@@ -9,6 +9,7 @@ import com.clanout.application.module.plan.domain.exception.PlanNotFoundExceptio
 import com.clanout.application.module.plan.domain.model.Attendee;
 import com.clanout.application.module.plan.domain.model.Location;
 import com.clanout.application.module.plan.domain.model.Plan;
+import com.clanout.application.module.plan.domain.model.PlanSuggestion;
 import com.clanout.application.module.plan.domain.repository.PlanRepository;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
@@ -26,8 +27,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class PlanRepositoryImpl implements PlanRepository
 {
@@ -35,6 +35,32 @@ public class PlanRepositoryImpl implements PlanRepository
 
     private static final String MONGO_PLAN_COLLECTION = "plans";
     private static final String SQL_READ_ATTENDEE_NAME = PostgresQuery.load("read_attendee_name.sql", PlanRepositoryImpl.class);
+    private static final String SQL_INSERT_PHONE_INVITATIONS = PostgresQuery.load("insert_phone_invitations.sql", PlanRepositoryImpl.class);
+    private static final String SQL_READ_PHONE_INVITATIONS = PostgresQuery.load("read_phone_invitations.sql", PlanRepositoryImpl.class);
+    private static final String SQL_DELETE_PHONE_INVITATIONS = PostgresQuery.load("delete_phone_invitations.sql", PlanRepositoryImpl.class);
+    private static final String SQL_READ_PLAN_SUGGESTIONS = PostgresQuery.load("read_plan_suggestions.sql", PlanRepositoryImpl.class);
+
+    @Override
+    public Plan fetch(String planId) throws PlanNotFoundException
+    {
+        Document planDocument = null;
+        try
+        {
+            MongoDatabase database = MongoDataSource.getInstance().getDatabase();
+            MongoCollection<Document> planCollection = database.getCollection(MONGO_PLAN_COLLECTION);
+            planDocument = planCollection.find(new Document("_id", new ObjectId(planId))).first();
+            if (planDocument == null)
+            {
+                throw new NullPointerException();
+            }
+
+            return MongoPlanMapper.map(planDocument, null);
+        }
+        catch (Exception e)
+        {
+            throw new PlanNotFoundException();
+        }
+    }
 
     @Override
     public Plan create(Plan plan)
@@ -272,6 +298,108 @@ public class PlanRepositoryImpl implements PlanRepository
         catch (Exception e)
         {
             LOG.error("Unable to update status in plan attendee list [" + e.getMessage() + "]");
+            throw new RuntimeException();
+        }
+    }
+
+    @Override
+    public void addPhoneInvitations(String planId, String userId, List<String> mobileNumbers)
+    {
+        try (Connection connection = PostgresDataSource.getInstance().getConnection())
+        {
+            for (String mobileNumber : mobileNumbers)
+            {
+                try (PreparedStatement statement = connection.prepareStatement(SQL_INSERT_PHONE_INVITATIONS))
+                {
+                    statement.setString(1, mobileNumber);
+                    statement.setString(2, planId);
+                    statement.setString(3, userId);
+                    statement.executeUpdate();
+                }
+                catch (SQLException e)
+                {
+                    LOG.error("Unable to create phone invitation [" + e.getSQLState() + " : " + e.getMessage() + "]");
+                }
+            }
+        }
+        catch (SQLException e)
+        {
+        }
+    }
+
+    @Override
+    public Map<String, Set<String>> fetchPendingInvitations(String mobileNumber)
+    {
+        try (Connection connection = PostgresDataSource.getInstance().getConnection();
+             PreparedStatement statement = connection.prepareStatement(SQL_READ_PHONE_INVITATIONS))
+        {
+            statement.setString(1, mobileNumber);
+
+            Map<String, Set<String>> result = new HashMap<>();
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next())
+            {
+                String userId = resultSet.getString("user_id");
+                String planId = resultSet.getString("plan_id");
+
+                if (result.containsKey(planId))
+                {
+                    result.get(planId).add(userId);
+                }
+                else
+                {
+                    Set<String> userIds = new HashSet<>();
+                    userIds.add(userId);
+                    result.put(planId, userIds);
+                }
+            }
+            resultSet.close();
+
+            return result;
+        }
+        catch (SQLException e)
+        {
+            LOG.error("Unable to read phone invitation [" + e.getSQLState() + " : " + e.getMessage() + "]");
+            throw new RuntimeException();
+        }
+    }
+
+    @Override
+    public void deletePendingInvitations(String mobileNumber)
+    {
+        try (Connection connection = PostgresDataSource.getInstance().getConnection();
+             PreparedStatement statement = connection.prepareStatement(SQL_DELETE_PHONE_INVITATIONS))
+        {
+            statement.setString(1, mobileNumber);
+            statement.executeUpdate();
+        }
+        catch (SQLException e)
+        {
+            LOG.error("Unable to delete phone invitations [" + e.getSQLState() + " : " + e.getMessage() + "]");
+        }
+    }
+
+    @Override
+    public List<PlanSuggestion> fetchCreateSuggestions()
+    {
+        try (Connection connection = PostgresDataSource.getInstance().getConnection();
+             PreparedStatement statement = connection.prepareStatement(SQL_READ_PLAN_SUGGESTIONS))
+        {
+            List<PlanSuggestion> suggestions = new ArrayList<>();
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next())
+            {
+                String category = resultSet.getString("category");
+                String title = resultSet.getString("title");
+                suggestions.add(new PlanSuggestion(category, title));
+            }
+            resultSet.close();
+
+            return suggestions;
+        }
+        catch (SQLException e)
+        {
+            LOG.error("Unable to read create plan suggestions [" + e.getSQLState() + " : " + e.getMessage() + "]");
             throw new RuntimeException();
         }
     }

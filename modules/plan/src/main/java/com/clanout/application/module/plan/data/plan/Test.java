@@ -40,9 +40,12 @@ public class Test
 //        invite();
 //        updateStatus();
 //        update();
-        feed();
+//        feed();
 //        createPlans();
 //        updateRsvp();
+
+        PlanRepository planRepository = new PlanRepositoryImpl();
+        System.out.println(GSON.toJson(planRepository.fetchPendingInvitations("+917022014333")));
 
 
         MongoDataSource.getInstance().close();

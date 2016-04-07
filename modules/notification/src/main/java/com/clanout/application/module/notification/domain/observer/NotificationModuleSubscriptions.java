@@ -3,8 +3,11 @@ package com.clanout.application.module.notification.domain.observer;
 import com.clanout.application.module.auth.context.AuthContext;
 import com.clanout.application.module.notification.domain.service.NotificationService;
 import com.clanout.application.module.plan.context.PlanContext;
+import com.clanout.application.module.plan.domain.model.Plan;
+import com.clanout.application.module.plan.domain.observer.PhoneInviteObserver;
 import com.clanout.application.module.user.context.UserContext;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 public class NotificationModuleSubscriptions
@@ -67,9 +70,9 @@ public class NotificationModuleSubscriptions
             });
         });
 
-        planContext.registerUpdatePlanObserver((planId, userId, description, startTime, endTime, location) -> {
+        planContext.registerUpdatePlanObserver((plan, userId, description, startTime, endTime, location) -> {
             backgroundPool.execute(() -> {
-                notificationService.planUpdated(planId, userId, description, startTime, endTime, location);
+                notificationService.planUpdated(plan, userId, description, startTime, endTime, location);
             });
         });
 
@@ -97,6 +100,12 @@ public class NotificationModuleSubscriptions
         planContext.registerChatUpdateObserver((planId, message) -> {
             backgroundPool.execute(() -> {
                 notificationService.chatUpdate(planId, message);
+            });
+        });
+
+        planContext.registerPhoneInviteObserver((plan, userId, mobileNumbers) -> {
+            backgroundPool.execute(() -> {
+                notificationService.mobileInvitation(userId, plan, mobileNumbers);
             });
         });
     }

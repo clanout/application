@@ -52,22 +52,22 @@ public class ChatModuleSubscriptions
             });
         });
 
-        planContext.registerUpdatePlanObserver((planId, userId, description, startTime, endTime, location) -> {
+        planContext.registerUpdatePlanObserver((plan, userId, description, startTime, endTime, location) -> {
             backgroundPool.execute(() -> {
 
                 if (startTime != null)
                 {
-                    chatService.planStartTimeUpdated(planId, userId, startTime);
+                    chatService.planStartTimeUpdated(plan.getId(), userId, startTime);
                 }
 
                 if (description != null)
                 {
-                    chatService.planDescriptionUpdated(planId, userId, description);
+                    chatService.planDescriptionUpdated(plan.getId(), userId, description);
                 }
 
                 if (location != null)
                 {
-                    chatService.planLocationUpdated(planId, userId, location);
+                    chatService.planLocationUpdated(plan.getId(), userId, location);
                 }
 
             });

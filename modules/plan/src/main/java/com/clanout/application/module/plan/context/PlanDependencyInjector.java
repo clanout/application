@@ -30,4 +30,8 @@ interface PlanDependencyInjector
     ChatUpdate chatUpdate();
 
     InvitationResponse invitationResponse();
+
+    FetchPendingInvitations fetchPendingInvitations();
+
+    FetchCreatePlanSuggestions fetchCreatePlanSuggestions();
 }

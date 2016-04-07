@@ -139,10 +139,10 @@ public class FanoutService
         LOG.info("[FANNING:DELETE] (" + plan.getId() + ", " + plan.getCreatorId() + ") " + usersAffected.toString());
     }
 
-    public void onUpdate(String planId, String userId, String description, OffsetDateTime startTime,
+    public void onUpdate(Plan plan, String userId, String description, OffsetDateTime startTime,
                          OffsetDateTime endTime, Location location)
     {
-        observers.onPlanUpdated(planId, userId, description, startTime, endTime, location);
+        observers.onPlanUpdated(plan, userId, description, startTime, endTime, location);
     }
 
     public void onRsvpUpdated(String userId, String planId, Rsvp rsvp)

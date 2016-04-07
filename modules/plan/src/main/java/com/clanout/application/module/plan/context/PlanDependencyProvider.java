@@ -12,6 +12,7 @@ import com.clanout.application.module.plan.domain.repository.FeedRepository;
 import com.clanout.application.module.plan.domain.repository.PlanRepository;
 import com.clanout.application.module.user.context.UserContext;
 import com.clanout.application.module.user.domain.use_case.FetchFriends;
+import com.clanout.application.module.user.domain.use_case.UpdateMobile;
 import dagger.Module;
 import dagger.Provides;
 
@@ -78,5 +79,12 @@ class PlanDependencyProvider
     public FetchFriends provideFetchFriends()
     {
         return userContext.fetchFriends();
+    }
+
+    @Provides
+    @ModuleScope
+    public UpdateMobile provideUpdateMobile()
+    {
+        return userContext.updateMobile();
     }
 }

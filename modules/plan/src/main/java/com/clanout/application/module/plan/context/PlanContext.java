@@ -99,6 +99,16 @@ public class PlanContext implements Context
         return injector.invitationResponse();
     }
 
+    public FetchPendingInvitations fetchPendingInvitations()
+    {
+        return injector.fetchPendingInvitations();
+    }
+
+    public FetchCreatePlanSuggestions fetchCreatePlanSuggestions()
+    {
+        return injector.fetchCreatePlanSuggestions();
+    }
+
     public void registerCreatePlanObserver(CreatePlanObserver observer)
     {
         observers.registerCreatePlanObserver(observer);
@@ -137,5 +147,10 @@ public class PlanContext implements Context
     public void registerInvitationResponseObserver(InvitationResponseObserver observer)
     {
         observers.registerInvitationResponseObserver(observer);
+    }
+
+    public void registerPhoneInviteObserver(PhoneInviteObserver observer)
+    {
+        observers.registerPhoneInvitationObserver(observer);
     }
 }

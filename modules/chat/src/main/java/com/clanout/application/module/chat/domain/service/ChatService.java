@@ -89,7 +89,7 @@ public class ChatService
     public void planInvitationResponse(String planId, String userId, String invitationResponse)
     {
         String name = chatRepository.getUserName(userId);
-        String message = "invitation_response:" + name + ":" + invitationResponse;
+        String message = "invitation_response:" + name;
         send(planId, message);
     }
 

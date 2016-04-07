@@ -2,13 +2,16 @@ package com.clanout.application.module.notification.domain.service;
 
 import com.clanout.application.framework.di.ModuleScope;
 import com.clanout.application.library.util.gson.GsonProvider;
+import com.clanout.application.library.util.validation.PhoneValidator;
 import com.clanout.application.module.notification.domain.model.Notification;
 import com.clanout.application.module.notification.domain.model.Type;
 import com.clanout.application.module.notification.domain.repository.NotificationRepository;
-import com.clanout.application.module.notification.domain.service.gcm.GcmNotification;
 import com.clanout.application.module.notification.domain.service.gcm.GcmApi;
 import com.clanout.application.module.notification.domain.service.gcm.GcmHelper;
+import com.clanout.application.module.notification.domain.service.gcm.GcmNotification;
 import com.clanout.application.module.notification.domain.service.gcm.GcmResponse;
+import com.clanout.application.module.notification.domain.service.sms.SmsApi;
+import com.clanout.application.module.notification.domain.service.sms.SmsHelper;
 import com.clanout.application.module.plan.domain.model.Location;
 import com.clanout.application.module.plan.domain.model.Plan;
 import com.clanout.application.module.plan.domain.model.Rsvp;
@@ -18,13 +21,13 @@ import com.clanout.application.module.user.domain.use_case.FetchFriends;
 import com.google.gson.Gson;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import retrofit.client.Response;
 
 import javax.inject.Inject;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @ModuleScope
@@ -102,18 +105,19 @@ public class NotificationService
         sendMulticast(affectedUsers, notification);
     }
 
-    public void planUpdated(String planId, String userId, String description, OffsetDateTime startTime,
+    public void planUpdated(Plan plan, String userId, String description, OffsetDateTime startTime,
                             OffsetDateTime endTime, Location location)
     {
         Notification notification = new Notification(Type.PLAN_UPDATED);
-        notification.addParameter("plan_id", planId);
-        notification.addParameter("plan_title", userId);
+        notification.addParameter("plan_id", plan.getId());
+        notification.addParameter("plan_title", plan.getTitle());
+        notification.addParameter("user_id", userId);
         notification.addParameter("user_name", notificationRepository.getUserName(userId));
         notification.addParameter("is_location_updated", String.valueOf(location != null));
         notification.addParameter("is_time_updated", String.valueOf(startTime != null || endTime != null));
         notification.addParameter("is_description_updated", String.valueOf(description != null));
 
-        sendBroadcast(planId, notification);
+        sendBroadcast(plan.getId(), notification);
     }
 
     public void rsvpUpdated(String userId, Plan plan, Rsvp rsvp,
@@ -161,6 +165,37 @@ public class NotificationService
         notification.addParameter("user_name", notificationRepository.getUserName(userId));
 
         sendMulticast(userIds, notification);
+    }
+
+    public void mobileInvitation(String userId, Plan plan, List<String> mobileNumbers)
+    {
+        System.out.println("HERE");
+
+        SmsApi smsApi = SmsHelper.getApi();
+        String name = notificationRepository.getUserName(userId);
+        String url = "www.clanout.com";
+
+        for (String mobileNumber : mobileNumbers)
+        {
+            if (PhoneValidator.isValid(mobileNumber))
+            {
+                try
+                {
+                    Response response = smsApi.sendBetaInvitation(mobileNumber, name, plan.getTitle(), url);
+                    int httpStatus = response.getStatus();
+                    if (httpStatus != 200)
+                    {
+                        throw new Exception("HTTP Status = " + httpStatus);
+                    }
+
+                    LOG.info("[SMS] Sent invitation to " + mobileNumber + "(" + plan.getId() + ":" + plan.getTitle() + ")");
+                }
+                catch (Exception e)
+                {
+                    LOG.error("[SMS] Failed to send sms to " + mobileNumber + " [" + e.getMessage() + "]");
+                }
+            }
+        }
     }
 
     public void blocked(String userId, List<String> blocked)
