@@ -175,17 +175,30 @@ public class PostgresUserRepository implements UserRepository
     @Override
     public void addFriends(String userId, List<String> friends)
     {
-        try (Connection connection = PostgresDataSource.getInstance().getConnection();
-             PreparedStatement statement = connection.prepareStatement(SQL_INSERT_FRIENDS))
+        try (Connection connection = PostgresDataSource.getInstance().getConnection())
         {
-            statement.setString(1, userId);
-            statement.setArray(2, connection.createArrayOf("varchar", friends.toArray()));
-
-            statement.executeUpdate();
+            for (String friendId : friends)
+            {
+                try
+                {
+                    PreparedStatement statement = connection.prepareStatement(SQL_INSERT_FRIENDS);
+                    statement.setString(1, userId);
+                    statement.setString(2, friendId);
+                    statement.executeUpdate();
+                    statement.close();
+                }
+                catch (SQLException e)
+                {
+                    if (!e.getSQLState().equals("23505"))
+                    {
+                        LOG.error("Add Friend Error [" + e.getSQLState() + " : " + e.getMessage() + "]");
+                    }
+                }
+            }
         }
         catch (SQLException e)
         {
-            LOG.error("Add Friends Error [" + e.getSQLState() + " : " + e.getMessage() + "]");
+            LOG.error("SQL connection error during Add Friends [" + e.getSQLState() + " : " + e.getMessage() + "]");
             throw new RuntimeException();
         }
     }

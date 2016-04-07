@@ -8,5 +8,6 @@ public enum Module
     AUTH,
     IMAGE,
     PLAN,
-    NOTIFICATION
+    NOTIFICATION,
+    CHAT
 }

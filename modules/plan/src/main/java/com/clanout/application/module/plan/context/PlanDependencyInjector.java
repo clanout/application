@@ -28,4 +28,6 @@ interface PlanDependencyInjector
     Invite invite();
 
     ChatUpdate chatUpdate();
+
+    InvitationResponse invitationResponse();
 }

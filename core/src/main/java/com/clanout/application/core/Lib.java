@@ -6,5 +6,6 @@ public enum Lib
     ASYNC,
     POSTGRES,
     REDIS,
-    MONGO
+    MONGO,
+    XMPP
 }

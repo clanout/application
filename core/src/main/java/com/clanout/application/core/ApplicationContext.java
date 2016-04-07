@@ -8,7 +8,9 @@ import com.clanout.application.library.mongo.MongoLibrary;
 import com.clanout.application.library.postgres.PostgresLibrary;
 import com.clanout.application.library.redis.RedisLibrary;
 import com.clanout.application.library.util.UtilLibrary;
+import com.clanout.application.library.xmpp.XmppLibrary;
 import com.clanout.application.module.auth.context.AuthContext;
+import com.clanout.application.module.chat.context.ChatContext;
 import com.clanout.application.module.image.context.ImageContext;
 import com.clanout.application.module.location.context.LocationContext;
 import com.clanout.application.module.notification.context.NotificationContext;
@@ -83,6 +85,9 @@ public class ApplicationContext
 
         NotificationContext notificationContext = new NotificationContext(userContext, authContext, planContext);
         modules.put(Module.NOTIFICATION, notificationContext);
+
+        ChatContext chatContext = new ChatContext(authContext, planContext);
+        modules.put(Module.CHAT, chatContext);
     }
 
     private void initLibs(ExecutorService backgroundPool) throws Exception
@@ -103,5 +108,8 @@ public class ApplicationContext
 
         MongoLibrary mongoLibrary = new MongoLibrary();
         libs.put(Lib.MONGO, mongoLibrary);
+
+        XmppLibrary xmppLibrary = new XmppLibrary();
+        libs.put(Lib.XMPP, xmppLibrary);
     }
 }

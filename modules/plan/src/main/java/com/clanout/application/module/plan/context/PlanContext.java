@@ -94,6 +94,11 @@ public class PlanContext implements Context
         return injector.chatUpdate();
     }
 
+    public InvitationResponse invitationResponse()
+    {
+        return injector.invitationResponse();
+    }
+
     public void registerCreatePlanObserver(CreatePlanObserver observer)
     {
         observers.registerCreatePlanObserver(observer);
@@ -127,5 +132,10 @@ public class PlanContext implements Context
     public void registerChatUpdateObserver(ChatUpdateObserver observer)
     {
         observers.registerChatUpdateObserver(observer);
+    }
+
+    public void registerInvitationResponseObserver(InvitationResponseObserver observer)
+    {
+        observers.registerInvitationResponseObserver(observer);
     }
 }

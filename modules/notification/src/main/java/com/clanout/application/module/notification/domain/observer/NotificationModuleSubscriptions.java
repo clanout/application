@@ -1,16 +1,10 @@
 package com.clanout.application.module.notification.domain.observer;
 
 import com.clanout.application.module.auth.context.AuthContext;
-import com.clanout.application.module.auth.domain.observer.NewUserRegistrationObserver;
 import com.clanout.application.module.notification.domain.service.NotificationService;
 import com.clanout.application.module.plan.context.PlanContext;
-import com.clanout.application.module.plan.domain.observer.ChatUpdateObserver;
-import com.clanout.application.module.plan.domain.observer.StatusUpdateObserver;
 import com.clanout.application.module.user.context.UserContext;
-import com.clanout.application.module.user.domain.observer.UsersBlockedObserver;
-import com.clanout.application.module.user.domain.observer.UsersUnblockedObserver;
 
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 public class NotificationModuleSubscriptions

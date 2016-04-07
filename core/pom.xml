@@ -59,6 +59,12 @@
             <version>${clanout.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.clanout.application</groupId>
+            <artifactId>module-chat</artifactId>
+            <version>${clanout.version}</version>
+        </dependency>
+
         <!-- Libraries -->
         <dependency>
             <groupId>com.clanout.application</groupId>
@@ -87,6 +93,12 @@
         <dependency>
             <groupId>com.clanout.application</groupId>
             <artifactId>lib-mongo</artifactId>
+            <version>${clanout.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.clanout.application</groupId>
+            <artifactId>lib-xmpp</artifactId>
             <version>${clanout.version}</version>
         </dependency>
 

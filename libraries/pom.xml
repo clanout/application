@@ -19,6 +19,7 @@
         <module>async</module>
         <module>redis</module>
         <module>mongo</module>
+        <module>xmpp</module>
     </modules>
 
     <dependencies>

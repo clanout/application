@@ -4,6 +4,7 @@ import com.clanout.application.module.plan.domain.model.Location;
 import com.clanout.application.module.plan.domain.model.Plan;
 import com.clanout.application.module.plan.domain.model.Rsvp;
 import com.clanout.application.module.plan.domain.service.FanoutService;
+import com.clanout.application.module.plan.domain.use_case.InvitationResponse;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ public class PlanModuleObservers
     private List<InviteObserver> inviteObservers;
     private List<ChatUpdateObserver> chatUpdateObservers;
     private List<StatusUpdateObserver> statusUpdateObservers;
+    private List<InvitationResponseObserver> invitationResponseObservers;
 
     public PlanModuleObservers()
     {
@@ -29,6 +31,7 @@ public class PlanModuleObservers
         inviteObservers = new ArrayList<>();
         chatUpdateObservers = new ArrayList<>();
         statusUpdateObservers = new ArrayList<>();
+        invitationResponseObservers = new ArrayList<>();
     }
 
     public void registerCreatePlanObserver(CreatePlanObserver observer)
@@ -64,6 +67,11 @@ public class PlanModuleObservers
     public void registerStatusUpdateObserver(StatusUpdateObserver observer)
     {
         statusUpdateObservers.add(observer);
+    }
+
+    public void registerInvitationResponseObserver(InvitationResponseObserver observer)
+    {
+        invitationResponseObservers.add(observer);
     }
 
     public void onPlanCreated(Plan plan, List<String> affectedUsers)
@@ -121,6 +129,14 @@ public class PlanModuleObservers
         for (StatusUpdateObserver observer : statusUpdateObservers)
         {
             observer.onStatusUpdated(planId, userId, status, isLastMoment);
+        }
+    }
+
+    public void onInvitationResponse(String planId, String userId, String invitationResponse)
+    {
+        for (InvitationResponseObserver observer : invitationResponseObservers)
+        {
+            observer.onInvitationResponse(planId, userId, invitationResponse);
         }
     }
 }
