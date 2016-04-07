@@ -1,6 +1,7 @@
 package com.clanout.application.module.plan.domain.use_case;
 
 import com.clanout.application.framework.di.ModuleScope;
+import com.clanout.application.framework.module.InvalidFieldException;
 import com.clanout.application.module.plan.domain.exception.FeedNotFoundException;
 import com.clanout.application.module.plan.domain.model.Feed;
 import com.clanout.application.module.plan.domain.repository.FeedRepository;
@@ -12,16 +13,28 @@ import java.time.OffsetDateTime;
 public class FetchFeed
 {
     private FeedRepository feedRepository;
+    private RecalculateFeed recalculateFeed;
 
     @Inject
-    public FetchFeed(FeedRepository feedRepository)
+    public FetchFeed(FeedRepository feedRepository, RecalculateFeed recalculateFeed)
     {
         this.feedRepository = feedRepository;
+        this.recalculateFeed = recalculateFeed;
     }
 
-    public Response execute(Request request) throws FeedNotFoundException
+    public Response execute(Request request) throws InvalidFieldException
     {
-        Feed feed = feedRepository.fetch(request.userId, request.lastUpdated);
+        Feed feed = null;
+        try
+        {
+            feed = feedRepository.fetchFeed(request.userId, request.lastUpdated);
+        }
+        catch (FeedNotFoundException e)
+        {
+            RecalculateFeed.Request recalculateFeedRequest = new RecalculateFeed.Request();
+            recalculateFeedRequest.userId = request.userId;
+            feed = recalculateFeed.execute(recalculateFeedRequest).feed;
+        }
 
         Response response = new Response();
         if (feed.getPlans() == null)

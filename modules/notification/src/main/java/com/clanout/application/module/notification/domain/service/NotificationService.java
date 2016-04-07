@@ -1,6 +1,7 @@
 package com.clanout.application.module.notification.domain.service;
 
 import com.clanout.application.framework.di.ModuleScope;
+import com.clanout.application.framework.module.InvalidFieldException;
 import com.clanout.application.library.util.gson.GsonProvider;
 import com.clanout.application.library.util.validation.PhoneValidator;
 import com.clanout.application.module.notification.domain.model.Notification;
@@ -50,7 +51,15 @@ public class NotificationService
     {
         FetchFriends.Request request = new FetchFriends.Request();
         request.userId = userId;
-        FetchFriends.Response response = fetchFriends.execute(request);
+        FetchFriends.Response response = null;
+        try
+        {
+            response = fetchFriends.execute(request);
+        }
+        catch (InvalidFieldException e)
+        {
+            return;
+        }
 
         List<String> friendIds = response.friends
                 .stream()
@@ -68,7 +77,15 @@ public class NotificationService
     {
         FetchFriends.Request request = new FetchFriends.Request();
         request.userId = userId;
-        FetchFriends.Response response = fetchFriends.execute(request);
+        FetchFriends.Response response = null;
+        try
+        {
+            response = fetchFriends.execute(request);
+        }
+        catch (InvalidFieldException e)
+        {
+            return;
+        }
 
         List<String> friendIds = response.friends
                 .stream()

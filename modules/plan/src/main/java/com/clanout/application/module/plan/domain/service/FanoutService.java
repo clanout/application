@@ -1,6 +1,7 @@
 package com.clanout.application.module.plan.domain.service;
 
 import com.clanout.application.framework.di.ModuleScope;
+import com.clanout.application.framework.module.InvalidFieldException;
 import com.clanout.application.module.plan.domain.exception.PlanNotFoundException;
 import com.clanout.application.module.plan.domain.model.*;
 import com.clanout.application.module.plan.domain.observer.PlanModuleObservers;
@@ -47,7 +48,16 @@ public class FanoutService
 
             FetchFriends.Request request = new FetchFriends.Request();
             request.userId = creatorId;
-            FetchFriends.Response response = fetchFriends.execute(request);
+            FetchFriends.Response response = null;
+            try
+            {
+                response = fetchFriends.execute(request);
+            }
+            catch (InvalidFieldException e)
+            {
+                return;
+            }
+
             List<Friend> friends = response.friends;
 
             List<String> visibilityZones = plan.getVisibilityZones();
@@ -115,7 +125,16 @@ public class FanoutService
             {
                 FetchFriends.Request request = new FetchFriends.Request();
                 request.userId = attendee.getId();
-                FetchFriends.Response response = fetchFriends.execute(request);
+                FetchFriends.Response response = null;
+                try
+                {
+                    response = fetchFriends.execute(request);
+                }
+                catch (Exception e)
+                {
+                    return;
+                }
+
                 List<Friend> friends = response.friends;
 
                 for (Friend friend : friends)
@@ -173,7 +192,15 @@ public class FanoutService
 
         FetchFriends.Request request = new FetchFriends.Request();
         request.userId = userId;
-        FetchFriends.Response response = fetchFriends.execute(request);
+        FetchFriends.Response response = null;
+        try
+        {
+            response = fetchFriends.execute(request);
+        }
+        catch (InvalidFieldException e)
+        {
+            return;
+        }
         List<Friend> friends = response.friends;
 
         List<String> visibilityZones = plan.getVisibilityZones();

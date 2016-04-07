@@ -20,6 +20,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -140,7 +141,7 @@ public class FeedRepositoryImpl implements FeedRepository
     }
 
     @Override
-    public Feed fetch(String userId, OffsetDateTime lastUpdated) throws FeedNotFoundException
+    public Feed fetchFeed(String userId, OffsetDateTime lastUpdated) throws FeedNotFoundException
     {
         try
         {
@@ -158,7 +159,15 @@ public class FeedRepositoryImpl implements FeedRepository
             }
 
             Feed feed = new Feed();
-            feed.setUpdatedAt(MongoDateTimeMapper.map(feedDocument, "updated_at"));
+            try
+            {
+                feed.setUpdatedAt(MongoDateTimeMapper.map(feedDocument, "updated_at"));
+            }
+            catch (Exception e)
+            {
+                feed.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
+                markFeedUpdated(userId);
+            }
 
             if (lastUpdated != null && !feed.getUpdatedAt().isAfter(lastUpdated))
             {

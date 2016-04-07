@@ -1,6 +1,8 @@
 package com.clanout.application.module.user.domain.use_case;
 
 import com.clanout.application.framework.di.ModuleScope;
+import com.clanout.application.framework.module.InvalidFieldException;
+import com.clanout.application.module.location.domain.model.LocationZone;
 import com.clanout.application.module.user.domain.model.Friend;
 import com.clanout.application.module.user.domain.repository.UserRepository;
 
@@ -19,8 +21,13 @@ public class FetchFriends
         this.userRepository = userRepository;
     }
 
-    public Response execute(Request request)
+    public Response execute(Request request) throws InvalidFieldException
     {
+        if(request.locationZone != null && request.locationZone.equals(LocationZone.UNKNOWN_ZONE.getZoneCode()))
+        {
+            throw new InvalidFieldException("location zone");
+        }
+
         List<Friend> friends = userRepository.fetchFriends(request.userId);
 
         String locationZone = request.locationZone;

@@ -10,8 +10,10 @@ import com.clanout.application.module.plan.domain.observer.PlanModuleObservers;
 import com.clanout.application.module.plan.domain.observer.PlanModuleSubscriptions;
 import com.clanout.application.module.plan.domain.repository.FeedRepository;
 import com.clanout.application.module.plan.domain.repository.PlanRepository;
+import com.clanout.application.module.plan.domain.use_case.RecalculateFeed;
 import com.clanout.application.module.user.context.UserContext;
 import com.clanout.application.module.user.domain.use_case.FetchFriends;
+import com.clanout.application.module.user.domain.use_case.FetchUser;
 import com.clanout.application.module.user.domain.use_case.UpdateMobile;
 import dagger.Module;
 import dagger.Provides;
@@ -48,9 +50,10 @@ class PlanDependencyProvider
 
     @Provides
     @ModuleScope
-    public PlanModuleSubscriptions providePlanModuleSubscriptions(ExecutorService backgroundPool)
+    public PlanModuleSubscriptions providePlanModuleSubscriptions(ExecutorService backgroundPool,
+                                                                  RecalculateFeed recalculateFeed)
     {
-        return new PlanModuleSubscriptions(backgroundPool, userContext);
+        return new PlanModuleSubscriptions(backgroundPool, userContext, recalculateFeed);
     }
 
     @Provides
@@ -79,6 +82,13 @@ class PlanDependencyProvider
     public FetchFriends provideFetchFriends()
     {
         return userContext.fetchFriends();
+    }
+
+    @Provides
+    @ModuleScope
+    public FetchUser provideFetchUser()
+    {
+        return userContext.fetchUser();
     }
 
     @Provides

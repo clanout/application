@@ -104,10 +104,10 @@ public class CreatePlan
 
         Set<String> visibilityZones = new HashSet<>();
         visibilityZones.add(request.locationZone);
-        if (!locationZone.equals(LocationZone.UNKNOWN_ZONE.getZoneCode()))
-        {
-            visibilityZones.add(locationZone);
-        }
+//        if (!locationZone.equals(LocationZone.UNKNOWN_ZONE.getZoneCode()))
+//        {
+//            visibilityZones.add(locationZone);
+//        }
         plan.setVisibilityZones(new ArrayList<>(visibilityZones));
 
         plan.setDescription(request.description);
@@ -141,7 +141,7 @@ public class CreatePlan
         });
 
         Response response = new Response();
-        response.planId = plan.getId();
+        response.plan = plan;
         return response;
     }
 
@@ -164,6 +164,6 @@ public class CreatePlan
 
     public static class Response
     {
-        public String planId;
+        public Plan plan;
     }
 }

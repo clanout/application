@@ -105,7 +105,7 @@ public class Test
         FeedRepository feedRepository = new FeedRepositoryImpl();
 
         OffsetDateTime lastUpdated = OffsetDateTime.now().minusDays(10);
-        Feed feed = feedRepository.fetch(HARSH, lastUpdated);
+        Feed feed = feedRepository.fetchFeed(HARSH, lastUpdated);
         System.out.println(GSON.toJson(feed));
     }
 

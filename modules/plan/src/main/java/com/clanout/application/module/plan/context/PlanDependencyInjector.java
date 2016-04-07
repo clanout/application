@@ -34,4 +34,6 @@ interface PlanDependencyInjector
     FetchPendingInvitations fetchPendingInvitations();
 
     FetchCreatePlanSuggestions fetchCreatePlanSuggestions();
+
+    RecalculateFeed recalculateFeed();
 }

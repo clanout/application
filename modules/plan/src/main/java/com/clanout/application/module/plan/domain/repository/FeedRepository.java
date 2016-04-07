@@ -17,7 +17,7 @@ public interface FeedRepository
 
     Plan fetch(String userId, String planId)throws PlanNotFoundException;
 
-    Feed fetch(String userId, OffsetDateTime lastUpdated) throws FeedNotFoundException;
+    Feed fetchFeed(String userId, OffsetDateTime lastUpdated) throws FeedNotFoundException;
 
     void markFeedUpdated(String userId);
 
