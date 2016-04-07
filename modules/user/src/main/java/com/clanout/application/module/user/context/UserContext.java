@@ -4,6 +4,8 @@ import com.clanout.application.framework.module.Context;
 import com.clanout.application.module.location.context.LocationContext;
 import com.clanout.application.module.user.domain.observer.LocationUpdateObserver;
 import com.clanout.application.module.user.domain.observer.UserModuleObservers;
+import com.clanout.application.module.user.domain.observer.UsersBlockedObserver;
+import com.clanout.application.module.user.domain.observer.UsersUnblockedObserver;
 import com.clanout.application.module.user.domain.use_case.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -78,8 +80,23 @@ public class UserContext implements Context
         return injector.blockFriends();
     }
 
+    public FetchRegisteredContacts fetchRegisteredContacts()
+    {
+        return injector.fetchRegisteredContacts();
+    }
+
     public void registerLocationUpdateObserver(LocationUpdateObserver observer)
     {
         observers.registerLocationUpdateObserver(observer);
+    }
+
+    public void registerUsersBlockedObserver(UsersBlockedObserver observer)
+    {
+        observers.registerUsersBlockedObserver(observer);
+    }
+
+    public void registerUsersUnblockedObserver(UsersUnblockedObserver observer)
+    {
+        observers.registerUsersUnblockedObserver(observer);
     }
 }

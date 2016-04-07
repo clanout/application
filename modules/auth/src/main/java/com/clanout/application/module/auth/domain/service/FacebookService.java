@@ -4,7 +4,7 @@ import com.clanout.application.framework.di.ModuleScope;
 import com.clanout.application.framework.module.InvalidFieldException;
 import com.clanout.application.library.util.gson.GsonProvider;
 import com.clanout.application.module.auth.domain.exception.InvalidAuthTokenException;
-import com.clanout.application.module.auth.domain.model.AuthenticatedUser;
+import com.clanout.application.module.auth.domain.model.RegisteredUser;
 import com.clanout.application.module.user.domain.exception.CreateUserException;
 import com.clanout.application.module.user.domain.model.User;
 import com.clanout.application.module.user.domain.use_case.AddFriends;
@@ -49,7 +49,7 @@ public class FacebookService
         this.addFriends = addFriends;
     }
 
-    public AuthenticatedUser getAuthenticatedUser(String accessToken)
+    public RegisteredUser getRegisteredUser(String accessToken)
             throws InvalidAuthTokenException, InvalidFieldException, CreateUserException
     {
         UserData userData = getFacebookUserData(accessToken);
@@ -96,7 +96,7 @@ public class FacebookService
 
         addFriends.execute(addFriendsRequest);
 
-        return new AuthenticatedUser(user, isNew);
+        return new RegisteredUser(user, isNew);
     }
 
     private UserFriends getFacebookFriends(String accessToken)

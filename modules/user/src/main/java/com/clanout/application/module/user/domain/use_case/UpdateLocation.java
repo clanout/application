@@ -5,17 +5,21 @@ import com.clanout.application.module.user.domain.observer.UserModuleObservers;
 import com.clanout.application.module.user.domain.repository.UserRepository;
 
 import javax.inject.Inject;
+import java.util.concurrent.ExecutorService;
 
 public class UpdateLocation
 {
+    private ExecutorService backgroundPool;
     private GetZone getZone;
     private UserRepository userRepository;
 
     private UserModuleObservers observers;
 
     @Inject
-    public UpdateLocation(GetZone getZone, UserRepository userRepository, UserModuleObservers observers)
+    public UpdateLocation(ExecutorService backgroundPool, GetZone getZone,
+                          UserRepository userRepository, UserModuleObservers observers)
     {
+        this.backgroundPool = backgroundPool;
         this.getZone = getZone;
         this.userRepository = userRepository;
         this.observers = observers;
@@ -31,7 +35,9 @@ public class UpdateLocation
         String locationZone = getZoneResponse.zoneCode;
         boolean isRelocated = userRepository.updateLocation(request.userId, locationZone);
 
-        observers.onLocationUpdated(locationZone, isRelocated);
+        backgroundPool.execute(() -> {
+            observers.onLocationUpdated(request.userId, locationZone, isRelocated);
+        });
 
         Response response = new Response();
         response.isRelocated = isRelocated;

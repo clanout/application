@@ -37,6 +37,8 @@ public class Test
         PostgresDataSource.getInstance().init();
         MongoDataSource.getInstance().init();
 
+//        invite();
+//        updateStatus();
 //        update();
         feed();
 //        createPlans();
@@ -47,6 +49,27 @@ public class Test
         PostgresDataSource.getInstance().close();
     }
 
+    public static void invite() throws PlanNotFoundException
+    {
+        String planId = "5703daab156407669fa8f976";
+
+        PlanRepository planRepository = new PlanRepositoryImpl();
+        FeedRepository feedRepository = new FeedRepositoryImpl();
+
+        feedRepository.invite(ADITYA, planId, Arrays.asList("4", "5"));
+    }
+
+    public static void updateStatus() throws PlanNotFoundException
+    {
+        String planId = "5703daab156407669fa8f976";
+
+        PlanRepository planRepository = new PlanRepositoryImpl();
+        FeedRepository feedRepository = new FeedRepositoryImpl();
+
+        planRepository.updateStatus(planId, ADITYA, "Hello, World!!!!!");
+        feedRepository.updateStatus(ADITYA, planId, "Hello, World!!!!!");
+    }
+
     public static void updateRsvp() throws PlanNotFoundException
     {
         String planId = "5703daab156407669fa8f976";
@@ -54,7 +77,7 @@ public class Test
         PlanRepository planRepository = new PlanRepositoryImpl();
         FeedRepository feedRepository = new FeedRepositoryImpl();
 
-        feedRepository.updateRsvp(ADITYA, planId, Rsvp.YES);
+        System.out.println(feedRepository.updateRsvp(ADITYA, planId, Rsvp.YES));
     }
 
     public static void update() throws PlanNotFoundException

@@ -13,6 +13,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.result.UpdateResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bson.Document;
@@ -217,63 +218,94 @@ public class FeedRepositoryImpl implements FeedRepository
     }
 
     @Override
-    public boolean updateRsvp(String userId, String planId, Rsvp rsvp) throws PlanNotFoundException
+    public boolean updateRsvp(String userId, String planId, Rsvp rsvp)
     {
         try
         {
             MongoDatabase database = MongoDataSource.getInstance().getDatabase();
-            MongoCollection<Document> feedCollection = database.getCollection(MONGO_USER_FEED_COLLECTION);
+            MongoCollection<Document> planCollection = database.getCollection(MONGO_USER_FEED_COLLECTION);
 
-            Document planContext = null;
-            try
-            {
-                Document filteredFeed = feedCollection
-                        .find(new Document("user_id", userId))
-                        .projection(Projections.elemMatch("plans", new Document("plan_id", planId)))
-                        .first();
+            Document searchQuery = new Document();
+            searchQuery.put("user_id", userId);
+            searchQuery.put("plans.plan_id", planId);
 
-                planContext = ((ArrayList<Document>) filteredFeed.get("plans")).get(0);
-                if (planContext == null)
-                {
-                    throw new NullPointerException();
-                }
-            }
-            catch (Exception e)
-            {
-                throw new PlanNotFoundException();
-            }
-
-            String oldRsvp = planContext.getString("rsvp");
-            if (oldRsvp.equals(rsvp.name()))
-            {
-                return false;
-            }
-
-            planContext.put("rsvp", rsvp.name());
-            planContext.put("status", "");
-
-            UpdateOptions updateOptions = new UpdateOptions();
-            updateOptions.upsert(true);
-
-            /* Remove Plan Entry (if exists) */
             Document updateObject = new Document();
-            updateObject.put("$pull", new Document("plans", new Document("plan_id", planId)));
-            feedCollection.updateOne(new BasicDBObject("user_id", userId), updateObject, updateOptions);
-
-            /* Insert Plan Entry */
-            updateObject = new Document();
-            updateObject.put("$addToSet", new Document("plans", planContext));
-            feedCollection.updateOne(new Document("user_id", userId), updateObject, updateOptions);
-
-            return true;
-        }
-        catch (PlanNotFoundException e)
-        {
-            throw e;
+            updateObject.put("plans.$.rsvp", rsvp.name());
+            UpdateResult updateResult = planCollection.updateOne(searchQuery, new Document("$set", updateObject));
+            return updateResult.getModifiedCount() > 0;
         }
         catch (Exception e)
         {
             LOG.error("Unable to update rsvp [" + e.getMessage() + "]");
+            throw new RuntimeException();
+        }
+    }
+
+    @Override
+    public void updateStatus(String userId, String planId, String status)
+    {
+        try
+        {
+            MongoDatabase database = MongoDataSource.getInstance().getDatabase();
+            MongoCollection<Document> planCollection = database.getCollection(MONGO_USER_FEED_COLLECTION);
+
+            Document searchQuery = new Document();
+            searchQuery.put("user_id", userId);
+            searchQuery.put("plans.plan_id", planId);
+
+            Document updateObject = new Document();
+            updateObject.put("plans.$.status", status);
+            planCollection.updateOne(searchQuery, new Document("$set", updateObject));
+        }
+        catch (Exception e)
+        {
+            LOG.error("Unable to update status in feed [" + e.getMessage() + "]");
+            throw new RuntimeException();
+        }
+    }
+
+    @Override
+    public void invite(String userId, String planId, List<String> to)
+    {
+        try
+        {
+            MongoDatabase database = MongoDataSource.getInstance().getDatabase();
+            MongoCollection<Document> planCollection = database.getCollection(MONGO_USER_FEED_COLLECTION);
+
+            Document searchQuery = new Document();
+            searchQuery.put("user_id", userId);
+            searchQuery.put("plans.plan_id", planId);
+
+            Document updateObject = new Document();
+            updateObject.put("plans.$.invitee", new Document("$each", to));
+            planCollection.updateOne(searchQuery, new Document("$addToSet", updateObject));
+        }
+        catch (Exception e)
+        {
+            LOG.error("Unable to add invitee in feed [" + e.getMessage() + "]");
+            throw new RuntimeException();
+        }
+    }
+
+    @Override
+    public void addInviter(String userId, String planId, String inviter)
+    {
+        try
+        {
+            MongoDatabase database = MongoDataSource.getInstance().getDatabase();
+            MongoCollection<Document> planCollection = database.getCollection(MONGO_USER_FEED_COLLECTION);
+
+            Document searchQuery = new Document();
+            searchQuery.put("user_id", userId);
+            searchQuery.put("plans.plan_id", planId);
+
+            Document updateObject = new Document();
+            updateObject.put("plans.$.inviter", inviter);
+            planCollection.updateOne(searchQuery, new Document("$addToSet", updateObject));
+        }
+        catch (Exception e)
+        {
+            LOG.error("Unable to add inviter in feed [" + e.getMessage() + "]");
             throw new RuntimeException();
         }
     }

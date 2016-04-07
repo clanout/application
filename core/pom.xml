@@ -53,6 +53,12 @@
             <version>${clanout.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.clanout.application</groupId>
+            <artifactId>module-notification</artifactId>
+            <version>${clanout.version}</version>
+        </dependency>
+
         <!-- Libraries -->
         <dependency>
             <groupId>com.clanout.application</groupId>

@@ -14,7 +14,7 @@
     <name>clanout-application-module-user</name>
 
     <properties>
-        <okhttp.version>2.7.5</okhttp.version>
+        <commons-codec.version>1.10</commons-codec.version>
     </properties>
 
     <dependencies>
@@ -32,11 +32,11 @@
             <version>${clanout.version}</version>
         </dependency>
 
-        <!-- Http Client -->
+        <!-- Apache Codec -->
         <dependency>
-            <groupId>com.squareup.okhttp</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>${okhttp.version}</version>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>${commons-codec.version}</version>
         </dependency>
 
     </dependencies>

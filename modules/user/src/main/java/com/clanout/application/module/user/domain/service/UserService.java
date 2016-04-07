@@ -1,6 +1,7 @@
 package com.clanout.application.module.user.domain.service;
 
 import com.clanout.application.framework.di.ModuleScope;
+import org.apache.commons.codec.binary.Base64;
 
 import javax.inject.Inject;
 import java.util.UUID;
@@ -15,6 +16,7 @@ public class UserService
 
     public String generateUserId()
     {
-        return UUID.randomUUID().toString();
+        String seed = UUID.randomUUID().toString() + System.nanoTime();
+        return Base64.encodeBase64URLSafeString(seed.getBytes());
     }
 }

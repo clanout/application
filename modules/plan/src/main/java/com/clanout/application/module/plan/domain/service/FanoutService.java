@@ -3,6 +3,7 @@ package com.clanout.application.module.plan.domain.service;
 import com.clanout.application.framework.di.ModuleScope;
 import com.clanout.application.module.plan.domain.exception.PlanNotFoundException;
 import com.clanout.application.module.plan.domain.model.*;
+import com.clanout.application.module.plan.domain.observer.PlanModuleObservers;
 import com.clanout.application.module.plan.domain.repository.FeedRepository;
 import com.clanout.application.module.user.domain.model.Friend;
 import com.clanout.application.module.user.domain.use_case.FetchFriends;
@@ -18,12 +19,15 @@ public class FanoutService
 {
     private static Logger LOG = LogManager.getRootLogger();
 
+    private PlanModuleObservers observers;
+
     private FetchFriends fetchFriends;
     private FeedRepository feedRepository;
 
     @Inject
-    public FanoutService(FetchFriends fetchFriends, FeedRepository feedRepository)
+    public FanoutService(PlanModuleObservers observers, FetchFriends fetchFriends, FeedRepository feedRepository)
     {
+        this.observers = observers;
         this.fetchFriends = fetchFriends;
         this.feedRepository = feedRepository;
     }
@@ -61,16 +65,16 @@ public class FanoutService
                     feedRepository.add(friend.getUserId(), plan);
                     feedRepository.markFeedUpdated(friend.getUserId());
                     usersAffected.put(friend.getUserId(), FanoutEffect.PLAN_ADDED);
-
-                    //TODO : Notification
                 }
             }
         }
 
+        observers.onPlanCreated(plan, new ArrayList<>(usersAffected.keySet()));
+
         LOG.info("[FANNING:CREATE] (" + plan.getId() + ", " + plan.getCreatorId() + ") " + usersAffected.toString());
     }
 
-    public void onDelete(String userId, String planId)
+    public void onDelete(String userId, Plan plan)
     {
         /*
          ** OPEN : Remove plan from the feed of all the attendees, their friends, and people they invited
@@ -79,16 +83,7 @@ public class FanoutService
 
         Map<String, FanoutEffect> usersAffected = new HashMap<>();
 
-        Plan plan = null;
-        try
-        {
-            plan = feedRepository.fetch(userId, planId);
-        }
-        catch (PlanNotFoundException e)
-        {
-            return;
-        }
-
+        String planId = plan.getId();
         Type planType = plan.getType();
         List<Attendee> attendees = plan.getAttendees();
 
@@ -136,17 +131,18 @@ public class FanoutService
             if (!userAffected.getKey().equals(userId))
             {
                 feedRepository.markFeedUpdated(userAffected.getKey());
-                // TODO: Notification
             }
         }
+
+        observers.onPlanDeleted(plan, new ArrayList<>(usersAffected.keySet()));
 
         LOG.info("[FANNING:DELETE] (" + plan.getId() + ", " + plan.getCreatorId() + ") " + usersAffected.toString());
     }
 
-    public void onUpdate(String planId, String description, OffsetDateTime startTime,
+    public void onUpdate(String planId, String userId, String description, OffsetDateTime startTime,
                          OffsetDateTime endTime, Location location)
     {
-        // TODO: Notification
+        observers.onPlanUpdated(planId, userId, description, startTime, endTime, location);
     }
 
     public void onRsvpUpdated(String userId, String planId, Rsvp rsvp)
@@ -244,14 +240,63 @@ public class FanoutService
         for (Map.Entry<String, FanoutEffect> userAffected : usersAffected.entrySet())
         {
             feedRepository.markFeedUpdated(userAffected.getKey());
-            //TODO: Notification
         }
+
+        observers.onRsvpUpdated(userId, plan, rsvp, usersAffected);
 
         LOG.info("[FANNING:RSVP] (" + plan.getId() + ", " + plan.getCreatorId() + ", " + rsvp +
                          ") " + usersAffected.toString());
     }
 
-    enum FanoutEffect
+    public void onInvite(String userId, String planId, List<String> to)
+    {
+        Map<String, FanoutEffect> usersAffected = new HashMap<>();
+
+        Plan plan = null;
+        try
+        {
+            plan = feedRepository.fetch(userId, planId);
+        }
+        catch (PlanNotFoundException e)
+        {
+            return;
+        }
+
+        for (String invitee : to)
+        {
+            try
+            {
+                plan = feedRepository.fetch(invitee, planId);
+
+                // Plan Already visible => Add user to inviter list
+                feedRepository.addInviter(invitee, planId, userId);
+                usersAffected.put(invitee, FanoutEffect.PLAN_UPDATED);
+            }
+            catch (PlanNotFoundException e)
+            {
+                // Plan Not visible => Add to feed
+                plan.setRsvp(Rsvp.DEFAULT);
+                plan.setStatus("");
+                plan.setFriends(Arrays.asList(userId));
+                plan.setInviter(Arrays.asList(userId));
+                plan.setInvitee(new ArrayList<>());
+
+                feedRepository.add(invitee, plan);
+                usersAffected.put(invitee, FanoutEffect.PLAN_ADDED);
+            }
+        }
+
+        for (Map.Entry<String, FanoutEffect> userAffected : usersAffected.entrySet())
+        {
+            feedRepository.markFeedUpdated(userAffected.getKey());
+        }
+
+        observers.onInvite(userId, plan, usersAffected);
+
+        LOG.info("[FANNING:INVITE] (" + plan.getId() + ", " + plan.getCreatorId() + ") " + usersAffected.toString());
+    }
+
+    public enum FanoutEffect
     {
         PLAN_ADDED,
         PLAN_REMOVED,

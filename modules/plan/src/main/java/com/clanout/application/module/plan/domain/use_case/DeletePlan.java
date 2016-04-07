@@ -46,13 +46,13 @@ public class DeletePlan
             throw new DeletePlanPermissionException();
         }
 
+        feedRepository.remove(request.userId, request.planId);
+
         /* Fan Out */
         backgroundPool.execute(() -> {
-            fanoutService.onDelete(request.userId, request.planId);
+            fanoutService.onDelete(request.userId, plan);
+            planRepository.delete(request.planId);
         });
-
-        feedRepository.remove(request.userId, request.planId);
-        planRepository.delete(request.planId);
     }
 
     public static class Request

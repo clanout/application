@@ -98,7 +98,7 @@ public class UpdatePlan
         /* Fan Out */
         final Location finalLocation = location;
         backgroundPool.execute(() -> {
-            fanoutService.onUpdate(request.planId, request.description,
+            fanoutService.onUpdate(request.planId, request.userId, request.description,
                                    request.startTime, request.endTime, finalLocation);
         });
     }

@@ -7,5 +7,6 @@ public enum Module
     USER,
     AUTH,
     IMAGE,
-    PLAN
+    PLAN,
+    NOTIFICATION
 }

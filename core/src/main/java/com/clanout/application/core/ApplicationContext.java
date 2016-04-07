@@ -11,6 +11,7 @@ import com.clanout.application.library.util.UtilLibrary;
 import com.clanout.application.module.auth.context.AuthContext;
 import com.clanout.application.module.image.context.ImageContext;
 import com.clanout.application.module.location.context.LocationContext;
+import com.clanout.application.module.notification.context.NotificationContext;
 import com.clanout.application.module.plan.context.PlanContext;
 import com.clanout.application.module.user.context.UserContext;
 import org.apache.logging.log4j.LogManager;
@@ -79,6 +80,9 @@ public class ApplicationContext
 
         PlanContext planContext = new PlanContext(locationContext, userContext);
         modules.put(Module.PLAN, planContext);
+
+        NotificationContext notificationContext = new NotificationContext(userContext, authContext, planContext);
+        modules.put(Module.NOTIFICATION, notificationContext);
     }
 
     private void initLibs(ExecutorService backgroundPool) throws Exception

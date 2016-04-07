@@ -7,7 +7,8 @@ import com.clanout.application.module.auth.domain.exception.CreateSessionExcepti
 import com.clanout.application.module.auth.domain.exception.InvalidAuthMethodException;
 import com.clanout.application.module.auth.domain.exception.InvalidAuthTokenException;
 import com.clanout.application.module.auth.domain.model.AuthMethod;
-import com.clanout.application.module.auth.domain.model.AuthenticatedUser;
+import com.clanout.application.module.auth.domain.model.RegisteredUser;
+import com.clanout.application.module.auth.domain.observer.AuthModuleObservers;
 import com.clanout.application.module.auth.domain.repository.TokenRepository;
 import com.clanout.application.module.auth.domain.service.FacebookService;
 import com.clanout.application.module.auth.domain.service.TokenService;
@@ -21,15 +22,18 @@ public class CreateSession
 {
     private ExecutorService backgroundPool;
 
+    private AuthModuleObservers observers;
+
     private TokenService tokenService;
     private FacebookService facebookService;
     private TokenRepository tokenRepository;
 
     @Inject
-    public CreateSession(ExecutorService backgroundPool, TokenService tokenService,
+    public CreateSession(ExecutorService backgroundPool, AuthModuleObservers observers, TokenService tokenService,
                          FacebookService facebookService, TokenRepository tokenRepository)
     {
         this.backgroundPool = backgroundPool;
+        this.observers = observers;
         this.tokenService = tokenService;
         this.facebookService = facebookService;
         this.tokenRepository = tokenRepository;
@@ -54,15 +58,23 @@ public class CreateSession
             throw new InvalidAuthTokenException();
         }
 
-        AuthenticatedUser user = null;
+        RegisteredUser user = null;
         switch (authMethod)
         {
             case FACEBOOK:
-                user = facebookService.getAuthenticatedUser(request.authToken);
+                user = facebookService.getRegisteredUser(request.authToken);
                 break;
 
             default:
                 throw new InvalidAuthMethodException();
+        }
+
+        if (user.isNew())
+        {
+            final String userId = user.getUserId();
+            backgroundPool.execute(() -> {
+                observers.onNewUserRegistered(userId);
+            });
         }
 
         try
@@ -74,7 +86,6 @@ public class CreateSession
             backgroundPool.execute(() -> {
                 tokenRepository.saveRefreshToken(userId, refreshToken);
             });
-
 
             Response response = new Response();
             response.accessToken = accessToken;

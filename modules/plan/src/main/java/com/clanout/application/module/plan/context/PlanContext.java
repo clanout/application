@@ -2,11 +2,13 @@ package com.clanout.application.module.plan.context;
 
 import com.clanout.application.framework.module.Context;
 import com.clanout.application.module.location.context.LocationContext;
-import com.clanout.application.module.plan.domain.observer.PlanModuleSubscriptions;
+import com.clanout.application.module.plan.domain.observer.*;
 import com.clanout.application.module.plan.domain.use_case.*;
 import com.clanout.application.module.user.context.UserContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import javax.inject.Inject;
 
 public class PlanContext implements Context
 {
@@ -17,7 +19,11 @@ public class PlanContext implements Context
     private LocationContext locationContext;
     private UserContext userContext;
 
-    private PlanModuleSubscriptions subscriptions;
+    /* Observers */
+    PlanModuleObservers observers;
+
+    /* Subscriptions */
+    PlanModuleSubscriptions subscriptions;
 
     public PlanContext(LocationContext locationContext, UserContext userContext)
     {
@@ -25,12 +31,15 @@ public class PlanContext implements Context
         this.locationContext = locationContext;
         this.userContext = userContext;
 
+        observers = new PlanModuleObservers();
+
         injector = DaggerPlanDependencyInjector
                 .builder()
-                .planDependencyProvider(new PlanDependencyProvider(locationContext, userContext))
+                .planDependencyProvider(new PlanDependencyProvider(this, locationContext, userContext))
                 .build();
 
-        subscriptions = new PlanModuleSubscriptions(userContext);
+        subscriptions = injector.subscriptions();
+        subscriptions.init();
     }
 
     @Override
@@ -68,5 +77,55 @@ public class PlanContext implements Context
     public UpdateRsvp updateRsvp()
     {
         return injector.updateRsvp();
+    }
+
+    public UpdateStatus updateStatus()
+    {
+        return injector.updateStatus();
+    }
+
+    public Invite invite()
+    {
+        return injector.invite();
+    }
+
+    public ChatUpdate chatUpdate()
+    {
+        return injector.chatUpdate();
+    }
+
+    public void registerCreatePlanObserver(CreatePlanObserver observer)
+    {
+        observers.registerCreatePlanObserver(observer);
+    }
+
+    public void registerDeletePlanObserver(DeletePlanObserver observer)
+    {
+        observers.registerDeletePlanObserver(observer);
+    }
+
+    public void registerUpdatePlanObserver(UpdatePlanObserver observer)
+    {
+        observers.registerUpdatePlanObserver(observer);
+    }
+
+    public void registerRsvpChangeObserver(RsvpChangeObserver observer)
+    {
+        observers.registerRsvpChangeObserver(observer);
+    }
+
+    public void registerInviteObserver(InviteObserver observer)
+    {
+        observers.registerInviteObserver(observer);
+    }
+
+    public void registerStatusUpdateObserver(StatusUpdateObserver observer)
+    {
+        observers.registerStatusUpdateObserver(observer);
+    }
+
+    public void registerChatUpdateObserver(ChatUpdateObserver observer)
+    {
+        observers.registerChatUpdateObserver(observer);
     }
 }

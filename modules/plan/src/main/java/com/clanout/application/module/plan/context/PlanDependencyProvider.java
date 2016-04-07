@@ -6,6 +6,8 @@ import com.clanout.application.module.location.context.LocationContext;
 import com.clanout.application.module.location.domain.use_case.GetZone;
 import com.clanout.application.module.plan.data.plan.FeedRepositoryImpl;
 import com.clanout.application.module.plan.data.plan.PlanRepositoryImpl;
+import com.clanout.application.module.plan.domain.observer.PlanModuleObservers;
+import com.clanout.application.module.plan.domain.observer.PlanModuleSubscriptions;
 import com.clanout.application.module.plan.domain.repository.FeedRepository;
 import com.clanout.application.module.plan.domain.repository.PlanRepository;
 import com.clanout.application.module.user.context.UserContext;
@@ -18,20 +20,36 @@ import java.util.concurrent.ExecutorService;
 @Module
 class PlanDependencyProvider
 {
+    private PlanContext planContext;
     private LocationContext locationContext;
     private UserContext userContext;
 
-    public PlanDependencyProvider(LocationContext locationContext, UserContext userContext)
+    public PlanDependencyProvider(PlanContext planContext, LocationContext locationContext, UserContext userContext)
     {
+        this.planContext = planContext;
         this.locationContext = locationContext;
         this.userContext = userContext;
     }
 
     @Provides
     @ModuleScope
-    public ExecutorService backgroundPool()
+    public ExecutorService provideBackgroundPool()
     {
         return AsyncPool.getInstance().getBackgroundPool();
+    }
+
+    @Provides
+    @ModuleScope
+    public PlanModuleObservers providePlanModuleObservers()
+    {
+        return planContext.observers;
+    }
+
+    @Provides
+    @ModuleScope
+    public PlanModuleSubscriptions providePlanModuleSubscriptions(ExecutorService backgroundPool)
+    {
+        return new PlanModuleSubscriptions(backgroundPool, userContext);
     }
 
     @Provides

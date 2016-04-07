@@ -1,28 +1,31 @@
 package com.clanout.application.module.plan.domain.observer;
 
+import com.clanout.application.framework.di.ModuleScope;
 import com.clanout.application.module.user.context.UserContext;
 import com.clanout.application.module.user.domain.observer.LocationUpdateObserver;
 
+import javax.inject.Inject;
+import java.util.concurrent.ExecutorService;
+
+@ModuleScope
 public class PlanModuleSubscriptions
 {
+    private ExecutorService backgroundPool;
     private UserContext userContext;
 
-    public PlanModuleSubscriptions(UserContext userContext)
+    @Inject
+    public PlanModuleSubscriptions(ExecutorService backgroundPool, UserContext userContext)
     {
+        this.backgroundPool = backgroundPool;
         this.userContext = userContext;
-
-        initUserLocationUpdateSubscription();
     }
 
-    private void initUserLocationUpdateSubscription()
+    public void init()
     {
-        userContext.registerLocationUpdateObserver(new LocationUpdateObserver()
-        {
-            @Override
-            public void onLocationUpdated(String locationZone, boolean isRelocated)
-            {
-                System.out.println("Location updated to " + locationZone);
-            }
+        userContext.registerLocationUpdateObserver((userId, locationZone, isRelocated) -> {
+            backgroundPool.execute(() -> {
+                System.out.println(userId + " relocated to " + locationZone);
+            });
         });
     }
 }

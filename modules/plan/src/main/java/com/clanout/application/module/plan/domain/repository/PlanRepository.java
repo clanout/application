@@ -20,4 +20,6 @@ public interface PlanRepository
     void addAttendee(String planId, Attendee attendee);
 
     void deleteAttendee(String planId, String userId);
+
+    void updateStatus(String planId, String userId, String status);
 }

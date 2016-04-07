@@ -23,6 +23,7 @@ public class PostgresUserRepository implements UserRepository
     private static final String SQL_READ_USER_USERNAME = PostgresQuery.load("read_user_username.sql", PostgresUserRepository.class);
     private static final String SQL_READ_USERS_USERNAME = PostgresQuery.load("read_users_username.sql", PostgresUserRepository.class);
     private static final String SQL_READ_FRIENDS = PostgresQuery.load("read_friends.sql", PostgresUserRepository.class);
+    private static final String SQL_READ_REGISTERED_CONTACTS = PostgresQuery.load("read_registered_contacts.sql", PostgresUserRepository.class);
 
     private static final String SQL_UPDATE_LOCATION = PostgresQuery.load("update_location.sql", PostgresUserRepository.class);
     private static final String SQL_UPDATE_MOBILE = PostgresQuery.load("update_mobile.sql", PostgresUserRepository.class);
@@ -333,6 +334,38 @@ public class PostgresUserRepository implements UserRepository
         {
             LOG.error("Unblock Friends Error [" + e.getSQLState() + " : " + e.getMessage() + "]");
             throw new RuntimeException();
+        }
+    }
+
+    @Override
+    public List<Friend> fetchRegisteredContacts(List<String> mobileHash)
+    {
+        try (Connection connection = PostgresDataSource.getInstance().getConnection();
+             PreparedStatement statement = connection.prepareStatement(SQL_READ_REGISTERED_CONTACTS))
+        {
+            statement.setArray(1, connection.createArrayOf("varchar", mobileHash.toArray()));
+
+            List<Friend> registeredContacts = new ArrayList<>();
+
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next())
+            {
+                Friend friend = new Friend();
+                friend.setUserId(resultSet.getString("user_id"));
+                friend.setName(resultSet.getString("name"));
+                friend.setLocationZone(resultSet.getString("location_zone"));
+                friend.setIsBlocked(false);
+
+                registeredContacts.add(friend);
+            }
+            resultSet.close();
+
+            return registeredContacts;
+        }
+        catch (SQLException e)
+        {
+            LOG.error("Registered Contacts Read Error [" + e.getSQLState() + " : " + e.getMessage() + "]");
+            return new ArrayList<>();
         }
     }
 }

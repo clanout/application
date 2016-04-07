@@ -23,4 +23,6 @@ interface UserDependencyInjector
     UpdateMobile updateMobile();
 
     BlockFriends blockFriends();
+
+    FetchRegisteredContacts fetchRegisteredContacts();
 }

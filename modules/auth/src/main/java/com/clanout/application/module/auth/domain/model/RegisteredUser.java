@@ -2,12 +2,12 @@ package com.clanout.application.module.auth.domain.model;
 
 import com.clanout.application.module.user.domain.model.User;
 
-public class AuthenticatedUser
+public class RegisteredUser
 {
     private User user;
     private boolean isNew;
 
-    public AuthenticatedUser(User user, boolean isNew)
+    public RegisteredUser(User user, boolean isNew)
     {
         this.user = user;
         this.isNew = isNew;

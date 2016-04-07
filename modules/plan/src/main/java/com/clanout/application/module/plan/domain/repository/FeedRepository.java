@@ -7,6 +7,7 @@ import com.clanout.application.module.plan.domain.model.Plan;
 import com.clanout.application.module.plan.domain.model.Rsvp;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 
 public interface FeedRepository
 {
@@ -20,5 +21,11 @@ public interface FeedRepository
 
     void markFeedUpdated(String userId);
 
-    boolean updateRsvp(String userId, String planId, Rsvp rsvp) throws PlanNotFoundException;
+    boolean updateRsvp(String userId, String planId, Rsvp rsvp);
+
+    void updateStatus(String userId, String planId, String status);
+
+    void invite(String userId, String planId, List<String> to);
+
+    void addInviter(String userId, String planId, String inviter);
 }

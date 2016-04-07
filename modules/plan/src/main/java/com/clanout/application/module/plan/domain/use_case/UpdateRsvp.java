@@ -31,7 +31,7 @@ public class UpdateRsvp
         this.fanoutService = fanoutService;
     }
 
-    public void execute(Request request) throws InvalidFieldException, PlanNotFoundException
+    public void execute(Request request) throws InvalidFieldException
     {
         if (StringUtils.isNullOrEmpty(request.planId))
         {
@@ -56,6 +56,8 @@ public class UpdateRsvp
 
         if (isRsvpUpdated)
         {
+            feedRepository.updateStatus(request.userId, request.planId, "");
+
             if (newRsvp == Rsvp.YES)
             {
                 Attendee attendee = new Attendee();

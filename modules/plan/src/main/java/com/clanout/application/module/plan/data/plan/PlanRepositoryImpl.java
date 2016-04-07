@@ -5,6 +5,7 @@ import com.clanout.application.library.mongo.MongoDateTimeMapper;
 import com.clanout.application.library.postgres.PostgresDataSource;
 import com.clanout.application.library.postgres.PostgresQuery;
 import com.clanout.application.library.util.common.StringUtils;
+import com.clanout.application.module.plan.domain.exception.PlanNotFoundException;
 import com.clanout.application.module.plan.domain.model.Attendee;
 import com.clanout.application.module.plan.domain.model.Location;
 import com.clanout.application.module.plan.domain.model.Plan;
@@ -12,6 +13,7 @@ import com.clanout.application.module.plan.domain.repository.PlanRepository;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.UpdateOptions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -222,6 +224,7 @@ public class PlanRepositoryImpl implements PlanRepository
             /* Insert Plan Entry */
             updateObject = new Document();
             updateObject.put("$addToSet", new Document("attendees", attendeeEntry));
+            updateObject.put("$set", new Document("updated_at", MongoDateTimeMapper.map(OffsetDateTime.now(ZoneOffset.UTC))));
             collection.updateOne(new Document("_id", new ObjectId(planId)), updateObject, updateOptions);
         }
         catch (Exception e)
@@ -240,11 +243,36 @@ public class PlanRepositoryImpl implements PlanRepository
 
             Document updateObject = new Document();
             updateObject.put("$pull", new Document("attendees", new Document("id", userId)));
+            updateObject.put("$set", new Document("updated_at", MongoDateTimeMapper.map(OffsetDateTime.now(ZoneOffset.UTC))));
             collection.updateOne(new BasicDBObject("_id", new ObjectId(planId)), updateObject);
         }
         catch (Exception e)
         {
             LOG.error("Unable to remove attendee from plan [" + e.getMessage() + "]");
+        }
+    }
+
+    @Override
+    public void updateStatus(String planId, String userId, String status)
+    {
+        try
+        {
+            MongoDatabase database = MongoDataSource.getInstance().getDatabase();
+            MongoCollection<Document> planCollection = database.getCollection(MONGO_PLAN_COLLECTION);
+
+            Document searchQuery = new Document();
+            searchQuery.put("_id", new ObjectId(planId));
+            searchQuery.put("attendees.id", userId);
+
+            Document updateObject = new Document();
+            updateObject.put("attendees.$.status", status);
+            updateObject.put("updated_at", MongoDateTimeMapper.map(OffsetDateTime.now(ZoneOffset.UTC)));
+            planCollection.updateOne(searchQuery, new Document("$set", updateObject));
+        }
+        catch (Exception e)
+        {
+            LOG.error("Unable to update status in plan attendee list [" + e.getMessage() + "]");
+            throw new RuntimeException();
         }
     }
 }

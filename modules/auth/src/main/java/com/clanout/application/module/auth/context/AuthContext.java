@@ -1,6 +1,8 @@
 package com.clanout.application.module.auth.context;
 
 import com.clanout.application.framework.module.Context;
+import com.clanout.application.module.auth.domain.observer.AuthModuleObservers;
+import com.clanout.application.module.auth.domain.observer.NewUserRegistrationObserver;
 import com.clanout.application.module.auth.domain.use_case.CreateSession;
 import com.clanout.application.module.auth.domain.use_case.RefreshSession;
 import com.clanout.application.module.auth.domain.use_case.VerifySession;
@@ -16,13 +18,19 @@ public class AuthContext implements Context
 
     private UserContext userContext;
 
+    /* Observers */
+    AuthModuleObservers observers;
+
     public AuthContext(UserContext userContext)
     {
         LOG.debug("[AuthContext initialized]");
         this.userContext = userContext;
+
+        observers = new AuthModuleObservers();
+
         injector = DaggerAuthDependencyInjector
                 .builder()
-                .authDependencyProvider(new AuthDependencyProvider(userContext))
+                .authDependencyProvider(new AuthDependencyProvider(this, userContext))
                 .build();
     }
 
@@ -46,5 +54,10 @@ public class AuthContext implements Context
     public RefreshSession refreshSession()
     {
         return injector.refreshSession();
+    }
+
+    public void registerNewUserRegistrartionObserver(NewUserRegistrationObserver observer)
+    {
+        observers.registerNewUserRegistrationObserver(observer);
     }
 }

@@ -26,4 +26,6 @@ public interface UserRepository
     void block(String userId, List<String> toBlock);
 
     void unblock(String userId, List<String> toUnblock);
+
+    List<Friend> fetchRegisteredContacts(List<String> mobileHash);
 }
