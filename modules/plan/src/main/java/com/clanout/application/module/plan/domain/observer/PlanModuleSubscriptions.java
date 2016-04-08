@@ -32,14 +32,17 @@ public class PlanModuleSubscriptions
         userContext.registerLocationUpdateObserver((userId, locationZone, isRelocated) -> {
             backgroundPool.execute(() -> {
 
-                RecalculateFeed.Request request = new RecalculateFeed.Request();
-                request.userId = userId;
-                try
+                if (isRelocated)
                 {
-                    recalculateFeed.execute(request);
-                }
-                catch (InvalidFieldException ignored)
-                {
+                    RecalculateFeed.Request request = new RecalculateFeed.Request();
+                    request.userId = userId;
+                    try
+                    {
+                        recalculateFeed.execute(request);
+                    }
+                    catch (InvalidFieldException ignored)
+                    {
+                    }
                 }
 
             });

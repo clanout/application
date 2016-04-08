@@ -264,7 +264,15 @@ public class NotificationService
         {
             GcmNotification gcmNotification = GcmNotification.Factory.multicastNotification(tokens, notification);
             GcmApi gcmApi = GcmHelper.getApi();
-            GcmResponse response = gcmApi.send(gcmNotification);
+            GcmResponse response = null;
+
+            try
+            {
+                response = gcmApi.send(gcmNotification);
+            }
+            catch (Exception e)
+            {
+            }
 
             if (response != null)
             {
@@ -299,19 +307,29 @@ public class NotificationService
     {
         channelId = "/topics/" + channelId;
 
+        LOG.info("[GCM] Broadcast : " + GSON.toJson(notification));
         GcmNotification gcmNotification = GcmNotification.Factory.broadcastNotification(channelId, notification);
         GcmApi gcmApi = GcmHelper.getApi();
-        GcmResponse response = gcmApi.send(gcmNotification);
+        GcmResponse response = null;
 
-        LOG.info("[GCM] Broadcast : " + GSON.toJson(notification));
-
-        if (response.getError() == null)
+        try
         {
-            LOG.info("[GCM] Successfully broadcasted message : " + response.getMessageId());
+            response = gcmApi.send(gcmNotification);
         }
-        else
+        catch (Exception e)
         {
-            LOG.error("[GCM] Failed to broadcast message [" + response.getError() + "]");
+        }
+
+        if (response != null)
+        {
+            if (response.getError() == null)
+            {
+                LOG.info("[GCM] Successfully broadcasted message : " + response.getMessageId());
+            }
+            else
+            {
+                LOG.error("[GCM] Failed to broadcast message [" + response.getError() + "]");
+            }
         }
     }
 }
