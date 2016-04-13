@@ -15,7 +15,7 @@ public class GcmHelper
     private static RestAdapter restAdapter;
 
     private static final String GCM_URL = ConfLoader.getConf(NotificationConf.NOTIFICATION).get("gcm.url");
-    private static final String GCM_KEY = ConfLoader.getConf(NotificationConf.NOTIFICATION).get("api_key");
+    private static final String GCM_KEY = ConfLoader.getConf(NotificationConf.NOTIFICATION).get("gcm.api_key");
 
     static
     {

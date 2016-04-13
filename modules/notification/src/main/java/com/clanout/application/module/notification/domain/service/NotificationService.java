@@ -22,6 +22,7 @@ import com.clanout.application.module.user.domain.use_case.FetchFriends;
 import com.google.gson.Gson;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 import javax.inject.Inject;
@@ -186,8 +187,6 @@ public class NotificationService
 
     public void mobileInvitation(String userId, Plan plan, List<String> mobileNumbers)
     {
-        System.out.println("HERE");
-
         SmsApi smsApi = SmsHelper.getApi();
         String name = notificationRepository.getUserName(userId);
         String url = "www.clanout.com";
@@ -255,7 +254,7 @@ public class NotificationService
 
 
     /* GCM Helpers */
-    private void sendMulticast(List<String> userIds, Notification notification)
+    public void sendMulticast(List<String> userIds, Notification notification)
     {
         List<String> tokens = notificationRepository.fetchTokens(userIds);
 
@@ -303,7 +302,7 @@ public class NotificationService
         }
     }
 
-    private void sendBroadcast(String channelId, Notification notification)
+    public void sendBroadcast(String channelId, Notification notification)
     {
         channelId = "/topics/" + channelId;
 

@@ -51,7 +51,7 @@ public class PostgresNotificationRepository implements NotificationRepository
             List<String> gcmTokens = new ArrayList<>();
             while (resultSet.next())
             {
-                userIds.add(resultSet.getString("gcm_token"));
+                gcmTokens.add(resultSet.getString("gcm_token"));
             }
             resultSet.close();
             return gcmTokens;
@@ -72,7 +72,6 @@ public class PostgresNotificationRepository implements NotificationRepository
             statement.setString(1, userId);
             ResultSet resultSet = statement.executeQuery();
 
-            List<String> gcmTokens = new ArrayList<>();
             if (resultSet.next())
             {
                 String name = resultSet.getString("name");

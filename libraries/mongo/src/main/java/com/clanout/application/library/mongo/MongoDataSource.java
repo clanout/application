@@ -5,9 +5,13 @@ import com.clanout.application.framework.conf.ConfLoader;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoDatabase;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class MongoDataSource
 {
+    private static Logger LOG = LogManager.getRootLogger();
+
     private static MongoDataSource instance;
 
     private MongoClient mongoClient;

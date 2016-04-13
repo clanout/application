@@ -17,6 +17,6 @@ public class UserService
     public String generateUserId()
     {
         String seed = UUID.randomUUID().toString() + System.nanoTime();
-        return Base64.encodeBase64URLSafeString(seed.getBytes());
+        return Base64.encodeBase64URLSafeString(seed.getBytes()).substring(0, 25);
     }
 }
