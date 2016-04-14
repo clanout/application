@@ -32,6 +32,26 @@ public class FeedRepositoryImpl implements FeedRepository
     private static final String MONGO_PLAN_COLLECTION = "plans";
 
     @Override
+    public void initializeFeed(String userId)
+    {
+        try
+        {
+            MongoDatabase database = MongoDataSource.getInstance().getDatabase();
+            MongoCollection<Document> collection = database.getCollection(MONGO_USER_FEED_COLLECTION);
+
+            Document createObject = new Document();
+            createObject.put("user_id", userId);
+            createObject.put("updated_at", MongoDateTimeMapper.map(OffsetDateTime.now()));
+            createObject.put("plans", new ArrayList<>());
+            collection.insertOne(createObject);
+        }
+        catch (Exception e)
+        {
+            LOG.error("Unable to create feed [" + e.getMessage() + "]");
+        }
+    }
+
+    @Override
     public void add(String userId, Plan plan)
     {
         try

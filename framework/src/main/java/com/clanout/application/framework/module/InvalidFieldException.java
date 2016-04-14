@@ -9,9 +9,8 @@ public class InvalidFieldException extends Exception
         this.fieldName = fieldName;
     }
 
-    @Override
-    public String getMessage()
+    public String getFieldName()
     {
-        return "Invalid " + fieldName;
+        return fieldName;
     }
 }

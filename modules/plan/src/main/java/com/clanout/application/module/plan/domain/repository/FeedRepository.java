@@ -11,6 +11,8 @@ import java.util.List;
 
 public interface FeedRepository
 {
+    void initializeFeed(String userId);
+
     void add(String userId, Plan plan);
 
     void remove(String userId, String planId);

@@ -133,8 +133,19 @@ public class RecalculateFeed
         {
             feed = feedRepository.fetchFeed(request.userId, null);
         }
-        catch (FeedNotFoundException ignored)
+        catch (FeedNotFoundException e)
         {
+            /* Create fresh feed */
+            feedRepository.initializeFeed(request.userId);
+
+            try
+            {
+                feed = feedRepository.fetchFeed(request.userId, null);
+            }
+            catch (FeedNotFoundException ignored)
+            {
+                // not possible
+            }
         }
 
         LOG.info("[Feed Recalculation] Completed for user_id = " + request.userId);
