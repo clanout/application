@@ -7,6 +7,7 @@ import com.clanout.application.library.xmpp.XmppManager;
 import com.clanout.application.module.chat.domain.model.ChatMessage;
 import com.clanout.application.module.chat.domain.repository.ChatRepository;
 import com.clanout.application.module.plan.domain.model.Location;
+import com.clanout.application.module.plan.domain.model.Plan;
 
 import javax.inject.Inject;
 import java.time.OffsetDateTime;
@@ -34,28 +35,28 @@ public class ChatService
         XmppManager.createChatroom(planId);
     }
 
-    public void userJoinedPlan(String planId, String userId)
+    public void userJoinedPlan(Plan plan, String userId)
     {
         String name = chatRepository.getUserName(userId);
         String message = "rsvp:" + name + ":YES";
-        send(planId, message);
+        send(plan.getId(), plan.getTitle(), message);
     }
 
-    public void userLeftPlan(String planId, String userId)
+    public void userLeftPlan(Plan plan, String userId)
     {
         String name = chatRepository.getUserName(userId);
         String message = "rsvp:" + name + ":NO";
-        send(planId, message);
+        send(plan.getId(), plan.getTitle(), message);
     }
 
-    public void planStartTimeUpdated(String planId, String userId, OffsetDateTime updatedStartTime)
+    public void planStartTimeUpdated(Plan plan, String userId, OffsetDateTime updatedStartTime)
     {
         String name = chatRepository.getUserName(userId);
         String message = "start_time:" + name + ":" + updatedStartTime.toString();
-        send(planId, message);
+        send(plan.getId(), plan.getTitle(), message);
     }
 
-    public void planLocationUpdated(String planId, String userId, Location location)
+    public void planLocationUpdated(Plan plan, String userId, Location location)
     {
         String name = chatRepository.getUserName(userId);
         String locationName = location.getName();
@@ -68,10 +69,10 @@ public class ChatService
         {
             message = "location:" + name + ":" + locationName;
         }
-        send(planId, message);
+        send(plan.getId(), plan.getTitle(), message);
     }
 
-    public void planDescriptionUpdated(String planId, String userId, String description)
+    public void planDescriptionUpdated(Plan plan, String userId, String description)
     {
         String name = chatRepository.getUserName(userId);
         String message = null;
@@ -83,19 +84,19 @@ public class ChatService
         {
             message = "description:" + name + ":" + description;
         }
-        send(planId, message);
+        send(plan.getId(), plan.getTitle(), message);
     }
 
     public void planInvitationResponse(String planId, String userId, String invitationResponse)
     {
         String name = chatRepository.getUserName(userId);
         String message = "invitation_response:" + name;
-        send(planId, message);
+        send(planId, null, message);
     }
 
-    private void send(String planId, String message)
+    private void send(String planId, String planTitle, String message)
     {
-        ChatMessage chatMessage = new ChatMessage(planId, ADMIN_NICK, ADMIN_NICK, message);
+        ChatMessage chatMessage = new ChatMessage(planId, planTitle, ADMIN_NICK, ADMIN_NICK, message);
         XmppManager.sendMessage(chatMessage.getPlanId(), GsonProvider.getGson().toJson(chatMessage));
     }
 }

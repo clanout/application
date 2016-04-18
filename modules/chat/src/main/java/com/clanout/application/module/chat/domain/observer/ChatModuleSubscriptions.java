@@ -42,11 +42,11 @@ public class ChatModuleSubscriptions
 
                 if (rsvp == Rsvp.YES)
                 {
-                    chatService.userJoinedPlan(plan.getId(), userId);
+                    chatService.userJoinedPlan(plan, userId);
                 }
                 else if (rsvp == Rsvp.NO)
                 {
-                    chatService.userLeftPlan(plan.getId(), userId);
+                    chatService.userLeftPlan(plan, userId);
                 }
 
             });
@@ -57,17 +57,17 @@ public class ChatModuleSubscriptions
 
                 if (startTime != null)
                 {
-                    chatService.planStartTimeUpdated(plan.getId(), userId, startTime);
+                    chatService.planStartTimeUpdated(plan, userId, startTime);
                 }
 
                 if (description != null)
                 {
-                    chatService.planDescriptionUpdated(plan.getId(), userId, description);
+                    chatService.planDescriptionUpdated(plan, userId, description);
                 }
 
                 if (location != null)
                 {
-                    chatService.planLocationUpdated(plan.getId(), userId, location);
+                    chatService.planLocationUpdated(plan, userId, location);
                 }
 
             });

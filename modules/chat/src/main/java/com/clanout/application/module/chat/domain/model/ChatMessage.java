@@ -7,15 +7,17 @@ public final class ChatMessage
 {
     private String id;
     private String planId;
+    private String planTitle;
     private String senderId;
     private String senderName;
     private OffsetDateTime timestamp;
     private String message;
 
-    public ChatMessage(String planId, String senderId, String senderName, String message)
+    public ChatMessage(String planId, String planTitle, String senderId, String senderName, String message)
     {
         id = planId + "_" + System.nanoTime();
         this.planId = planId;
+        this.planTitle = planTitle;
         this.senderId = senderId;
         this.senderName = senderName;
         this.message = message;
