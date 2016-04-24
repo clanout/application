@@ -14,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 import javax.inject.Inject;
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @ModuleScope
 public class FanoutService
@@ -289,14 +290,42 @@ public class FanoutService
             return;
         }
 
+        FetchFriends.Request request = new FetchFriends.Request();
+        request.userId = userId;
+        FetchFriends.Response response = null;
+        try
+        {
+            response = fetchFriends.execute(request);
+        }
+        catch (InvalidFieldException e)
+        {
+            return;
+        }
+        List<String> friends = response.friends
+                .stream()
+                .map(Friend::getUserId)
+                .collect(Collectors.toList());
+
         for (String invitee : to)
         {
             try
             {
                 plan = feedRepository.fetch(invitee, planId);
 
-                // Plan Already visible => Add user to inviter list
-                feedRepository.addInviter(invitee, planId, userId);
+                // Plan Already visible => Add user to inviter list and friends going list (if required)
+
+                if (friends.contains(invitee))
+                {
+                    Set<String> friendsGoing = new HashSet<>(plan.getFriends());
+                    friendsGoing.add(userId);
+                    plan.setFriends(new ArrayList<>(friendsGoing));
+                }
+
+                Set<String> inviters = new HashSet<>(plan.getInviter());
+                inviters.add(userId);
+                plan.setInviter(new ArrayList<>(inviters));
+
+                feedRepository.add(invitee, plan);
                 usersAffected.put(invitee, FanoutEffect.PLAN_UPDATED);
             }
             catch (PlanNotFoundException e)

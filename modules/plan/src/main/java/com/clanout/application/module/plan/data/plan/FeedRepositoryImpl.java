@@ -8,7 +8,6 @@ import com.clanout.application.module.plan.domain.model.Feed;
 import com.clanout.application.module.plan.domain.model.Plan;
 import com.clanout.application.module.plan.domain.model.Rsvp;
 import com.clanout.application.module.plan.domain.repository.FeedRepository;
-import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Projections;
@@ -23,6 +22,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class FeedRepositoryImpl implements FeedRepository
 {
@@ -30,6 +30,7 @@ public class FeedRepositoryImpl implements FeedRepository
 
     private static final String MONGO_USER_FEED_COLLECTION = "user_feed";
     private static final String MONGO_PLAN_COLLECTION = "plans";
+    private static final String MONGO_USER_ARCHIVE_COLLECTION = "user_archive";
 
     @Override
     public void initializeFeed(String userId)
@@ -73,7 +74,7 @@ public class FeedRepositoryImpl implements FeedRepository
             /* Remove Plan Entry (if exists) */
             Document updateObject = new Document();
             updateObject.put("$pull", new Document("plans", new Document("plan_id", plan.getId())));
-            collection.updateOne(new BasicDBObject("user_id", userId), updateObject, updateOptions);
+            collection.updateOne(new Document("user_id", userId), updateObject, updateOptions);
 
             /* Insert Plan Entry */
             updateObject = new Document();
@@ -96,7 +97,7 @@ public class FeedRepositoryImpl implements FeedRepository
 
             Document updateObject = new Document();
             updateObject.put("$pull", new Document("plans", new Document("plan_id", planId)));
-            collection.updateOne(new BasicDBObject("user_id", userId), updateObject);
+            collection.updateOne(new Document("user_id", userId), updateObject);
         }
         catch (Exception e)
         {
@@ -238,7 +239,7 @@ public class FeedRepositoryImpl implements FeedRepository
 
             Document updateObject = new Document();
             updateObject.put("$set", new Document("updated_at", MongoDateTimeMapper.map(OffsetDateTime.now())));
-            collection.updateOne(new BasicDBObject("user_id", userId), updateObject);
+            collection.updateOne(new Document("user_id", userId), updateObject);
         }
         catch (Exception e)
         {
@@ -317,24 +318,58 @@ public class FeedRepositoryImpl implements FeedRepository
     }
 
     @Override
-    public void addInviter(String userId, String planId, String inviter)
+    public List<String> fetchPlanViewers(String planId)
     {
         try
         {
             MongoDatabase database = MongoDataSource.getInstance().getDatabase();
-            MongoCollection<Document> planCollection = database.getCollection(MONGO_USER_FEED_COLLECTION);
+            MongoCollection<Document> feedCollection = database.getCollection(MONGO_USER_FEED_COLLECTION);
 
-            Document searchQuery = new Document();
-            searchQuery.put("user_id", userId);
-            searchQuery.put("plans.plan_id", planId);
+            Document query = new Document();
+            query.put("plans.plan_id", planId);
 
-            Document updateObject = new Document();
-            updateObject.put("plans.$.inviter", inviter);
-            planCollection.updateOne(searchQuery, new Document("$addToSet", updateObject));
+            List<String> userIds = new ArrayList<>();
+            feedCollection
+                    .find(query)
+                    .forEach((Consumer<Document>) document -> {
+                        userIds.add(document.getString("user_id"));
+                    });
+            return userIds;
         }
         catch (Exception e)
         {
-            LOG.error("Unable to add inviter in feed [" + e.getMessage() + "]");
+            LOG.error("Unable to plan viewers [" + e.getMessage() + "]");
+            throw new RuntimeException();
+        }
+    }
+
+    @Override
+    public void archive(String planId, List<String> userIds)
+    {
+        try
+        {
+            MongoDatabase database = MongoDataSource.getInstance().getDatabase();
+            MongoCollection<Document> userArchive = database.getCollection(MONGO_USER_ARCHIVE_COLLECTION);
+
+            for (String userId : userIds)
+            {
+                try
+                {
+                    UpdateOptions updateOptions = new UpdateOptions();
+                    updateOptions.upsert(true);
+
+                    Document updateObject = new Document();
+                    updateObject.put("$addToSet", new Document("plans", planId));
+                    userArchive.updateOne(new Document("user_id", userId), updateObject, updateOptions);
+                }
+                catch (Exception e)
+                {
+                    LOG.error("Unable to add plan to user archive [" + e.getMessage() + "]");
+                }
+            }
+        }
+        catch (Exception e)
+        {
             throw new RuntimeException();
         }
     }

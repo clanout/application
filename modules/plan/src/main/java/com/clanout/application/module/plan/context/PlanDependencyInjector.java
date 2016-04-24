@@ -36,4 +36,6 @@ interface PlanDependencyInjector
     FetchCreatePlanSuggestions fetchCreatePlanSuggestions();
 
     RecalculateFeed recalculateFeed();
+
+    ArchivePlans archivePlans();
 }

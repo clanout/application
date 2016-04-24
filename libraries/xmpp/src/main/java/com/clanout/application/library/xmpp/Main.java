@@ -6,7 +6,6 @@ public class Main
     {
         XmppLibrary xmppLibrary = new XmppLibrary();
 
-//        XmppManager.createUser("test_user");
         XmppManager.sendMessage("dummy", "Hello!!");
 
         xmppLibrary.destroy();

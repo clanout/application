@@ -28,12 +28,15 @@ import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.function.Consumer;
 
 public class PlanRepositoryImpl implements PlanRepository
 {
     private static Logger LOG = LogManager.getRootLogger();
 
     private static final String MONGO_PLAN_COLLECTION = "plans";
+    private static final String MONGO_PLAN_ARCHIVE_COLLECTION = "plans_archive";
+
     private static final String SQL_READ_ATTENDEE_NAME = PostgresQuery.load("read_attendee_name.sql", PlanRepositoryImpl.class);
     private static final String SQL_INSERT_PHONE_INVITATIONS = PostgresQuery.load("insert_phone_invitations.sql", PlanRepositoryImpl.class);
     private static final String SQL_READ_PHONE_INVITATIONS = PostgresQuery.load("read_phone_invitations.sql", PlanRepositoryImpl.class);
@@ -401,6 +404,101 @@ public class PlanRepositoryImpl implements PlanRepository
         {
             LOG.error("Unable to read create plan suggestions [" + e.getSQLState() + " : " + e.getMessage() + "]");
             throw new RuntimeException();
+        }
+    }
+
+    @Override
+    public List<Plan> fetchExpiredPlans(OffsetDateTime timestamp)
+    {
+        try
+        {
+            MongoDatabase database = MongoDataSource.getInstance().getDatabase();
+            MongoCollection<Document> planCollection = database.getCollection(MONGO_PLAN_COLLECTION);
+
+            List<Plan> plans = new ArrayList<>();
+            Document query = new Document();
+            query.put("end_time", new Document("$lt", MongoDateTimeMapper.map(timestamp)));
+            planCollection
+                    .find(query)
+                    .forEach((Consumer<Document>) document -> {
+                        try
+                        {
+                            plans.add(MongoPlanMapper.map(document, null));
+                        }
+                        catch (Exception e)
+                        {
+                            LOG.error("Unable to read plan [" + e.getMessage() + "]");
+                        }
+                    });
+
+            return plans;
+        }
+        catch (Exception e)
+        {
+            LOG.error("Unable to read expired plans [" + e.getMessage() + "]");
+            throw new RuntimeException();
+        }
+    }
+
+    @Override
+    public void archive(Plan plan)
+    {
+        try
+        {
+            MongoDatabase database = MongoDataSource.getInstance().getDatabase();
+            MongoCollection<Document> collection = database.getCollection(MONGO_PLAN_ARCHIVE_COLLECTION);
+
+            Document document = new Document();
+
+            document.put("_id", new ObjectId(plan.getId()));
+            document.put("title", plan.getTitle());
+            document.put("type", plan.getType().name());
+            document.put("category", plan.getCategory());
+            document.put("creator_id", plan.getCreatorId());
+
+            document.put("visibility_zones", plan.getVisibilityZones());
+
+            if (plan.getDescription() != null)
+            {
+                document.put("description", plan.getDescription());
+            }
+
+            document.put("start_time", MongoDateTimeMapper.map(plan.getStartTime()));
+            document.put("end_time", MongoDateTimeMapper.map(plan.getEndTime()));
+
+            Location location = plan.getLocation();
+            if (location != null)
+            {
+                Document locationDoc = new Document();
+                locationDoc.put("name", location.getName());
+                locationDoc.put("latitude", location.getLatitude());
+                locationDoc.put("longitude", location.getLongitude());
+
+                document.put("location", locationDoc);
+            }
+
+            document.put("created_at", MongoDateTimeMapper.map(plan.getCreatedAt()));
+            document.put("updated_at", MongoDateTimeMapper.map(plan.getUpdatedAt()));
+
+            List<Attendee> attendees = plan.getAttendees();
+            ArrayList<Document> attendeeDocuments = new ArrayList<>();
+            for (Attendee attendee : attendees)
+            {
+                Document attendeeDocument = new Document();
+                attendeeDocument.put("id", attendee.getId());
+                attendeeDocument.put("name", attendee.getName());
+                attendeeDocument.put("status", attendee.getStatus());
+                attendeeDocuments.add(attendeeDocument);
+            }
+            document.put("attendees", attendeeDocuments);
+
+            collection.insertOne(document);
+
+
+        }
+        catch (Exception e)
+        {
+            LOG.error("Unable to archive plan [" + e.getMessage() + "]");
         }
     }
 }

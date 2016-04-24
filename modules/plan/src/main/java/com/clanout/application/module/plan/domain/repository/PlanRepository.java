@@ -37,4 +37,8 @@ public interface PlanRepository
     void deletePendingInvitations(String mobileNumber);
 
     List<PlanSuggestion> fetchCreateSuggestions();
+
+    List<Plan> fetchExpiredPlans(OffsetDateTime timestamp);
+
+    void archive(Plan plan);
 }

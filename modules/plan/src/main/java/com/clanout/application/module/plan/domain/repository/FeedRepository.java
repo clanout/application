@@ -17,7 +17,7 @@ public interface FeedRepository
 
     void remove(String userId, String planId);
 
-    Plan fetch(String userId, String planId)throws PlanNotFoundException;
+    Plan fetch(String userId, String planId) throws PlanNotFoundException;
 
     Feed fetchFeed(String userId, OffsetDateTime lastUpdated) throws FeedNotFoundException;
 
@@ -29,5 +29,7 @@ public interface FeedRepository
 
     void invite(String userId, String planId, List<String> to);
 
-    void addInviter(String userId, String planId, String inviter);
+    List<String> fetchPlanViewers(String planId);
+
+    void archive(String planId, List<String> userIds);
 }

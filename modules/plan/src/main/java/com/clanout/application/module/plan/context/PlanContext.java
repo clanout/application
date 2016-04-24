@@ -109,6 +109,11 @@ public class PlanContext implements Context
         return injector.fetchCreatePlanSuggestions();
     }
 
+    public ArchivePlans archivePlans()
+    {
+        return injector.archivePlans();
+    }
+
     public void registerCreatePlanObserver(CreatePlanObserver observer)
     {
         observers.registerCreatePlanObserver(observer);
