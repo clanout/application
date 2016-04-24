@@ -11,6 +11,7 @@ import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jivesoftware.smackx.iqregister.AccountManager;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.MultiUserChatManager;
+import org.jivesoftware.smackx.ping.PingManager;
 
 public class XmppManager
 {
@@ -109,6 +110,7 @@ public class XmppManager
     }
 
     private AbstractXMPPConnection connection;
+    private PingManager pingManager;
 
 
     private XmppManager()
@@ -151,6 +153,12 @@ public class XmppManager
                 if (!connection.isAuthenticated())
                 {
                     connection.login();
+                }
+
+                if (pingManager == null)
+                {
+                    pingManager = PingManager.getInstanceFor(connection);
+                    pingManager.setPingInterval(10);
                 }
 
                 return connection;
