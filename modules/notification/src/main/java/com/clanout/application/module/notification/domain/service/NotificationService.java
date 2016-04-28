@@ -189,7 +189,7 @@ public class NotificationService
     {
         SmsApi smsApi = SmsHelper.getApi();
         String name = notificationRepository.getUserName(userId);
-        String url = "https://goo.gl/Jc33PQ";
+        String url = "get.clanout.com";
 
         for (String mobileNumber : mobileNumbers)
         {
