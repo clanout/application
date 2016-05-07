@@ -208,47 +208,50 @@ public class FanoutService
 
         for (Friend friend : friends)
         {
-            if (visibilityZones.contains(friend.getLocationZone()))
+            try
             {
-                try
-                {
-                    // Already visible to the friend
-                    plan = feedRepository.fetch(friend.getUserId(), planId);
+                // Already visible to the friend
+                plan = feedRepository.fetch(friend.getUserId(), planId);
 
-                    if (rsvp == Rsvp.YES)
+                if (rsvp == Rsvp.YES)
+                {
+                    // Add this user to "friends_going" list for this friend
+                    Set<String> friendGoing = new HashSet<>(plan.getFriends());
+                    friendGoing.add(userId);
+                    plan.setFriends(new ArrayList<>(friendGoing));
+
+                    feedRepository.add(friend.getUserId(), plan);
+                    usersAffected.put(friend.getUserId(), FanoutEffect.PLAN_UPDATED);
+                }
+                else
+                {
+                    // Remove this user from "friends_going" list for this friend
+                    Set<String> friendGoing = new HashSet<>(plan.getFriends());
+                    friendGoing.remove(userId);
+                    plan.setFriends(new ArrayList<>(friendGoing));
+
+                    boolean shouldRemove = (plan.getRsvp() != Rsvp.YES) && (plan.getInviter().isEmpty()) &&
+                            (plan.getFriends().isEmpty());
+
+                    // Remove the plan from friend's feed if there is not other connection
+                    if (shouldRemove)
                     {
-                        // Add this user to "friends_going" list for this friend
-                        if (!plan.getFriends().contains(userId))
-                        {
-                            plan.getFriends().add(userId);
-                            feedRepository.add(friend.getUserId(), plan);
-                            usersAffected.put(friend.getUserId(), FanoutEffect.PLAN_UPDATED);
-                        }
+                        feedRepository.remove(friend.getUserId(), planId);
+                        usersAffected.put(friend.getUserId(), FanoutEffect.PLAN_REMOVED);
                     }
                     else
                     {
-                        // Remove this user from "friends_going" list for this friend
-                        plan.getFriends().remove(userId);
-                        boolean shouldRemove = (plan.getRsvp() != Rsvp.YES) && (plan.getInviter().isEmpty()) &&
-                                (plan.getFriends().isEmpty());
-
-                        // Remove the plan from friend's feed if there is not other connection
-                        if (shouldRemove)
-                        {
-                            feedRepository.remove(friend.getUserId(), planId);
-                            usersAffected.put(friend.getUserId(), FanoutEffect.PLAN_REMOVED);
-                        }
-                        else
-                        {
-                            feedRepository.add(friend.getUserId(), plan);
-                            usersAffected.put(friend.getUserId(), FanoutEffect.PLAN_UPDATED);
-                        }
-
+                        feedRepository.add(friend.getUserId(), plan);
+                        usersAffected.put(friend.getUserId(), FanoutEffect.PLAN_UPDATED);
                     }
+
                 }
-                catch (PlanNotFoundException e)
+            }
+            catch (PlanNotFoundException e)
+            {
+                // Initially not visible to friend and plan is open
+                if (visibilityZones.contains(friend.getLocationZone()))
                 {
-                    // Initially not visible to friend and plan is open
                     if (planType == Type.OPEN && rsvp == Rsvp.YES)
                     {
                         plan.setRsvp(Rsvp.DEFAULT);
@@ -313,13 +316,9 @@ public class FanoutService
                 plan = feedRepository.fetch(invitee, planId);
 
                 // Plan Already visible => Add user to inviter list and friends going list (if required)
-
-                if (friends.contains(invitee))
-                {
-                    Set<String> friendsGoing = new HashSet<>(plan.getFriends());
-                    friendsGoing.add(userId);
-                    plan.setFriends(new ArrayList<>(friendsGoing));
-                }
+                Set<String> friendsGoing = new HashSet<>(plan.getFriends());
+                friendsGoing.add(userId);
+                plan.setFriends(new ArrayList<>(friendsGoing));
 
                 Set<String> inviters = new HashSet<>(plan.getInviter());
                 inviters.add(userId);

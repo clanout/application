@@ -17,9 +17,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ModuleScope
@@ -95,10 +93,8 @@ public class RecalculateFeed
                             Plan userPlan = feedRepository.fetch(userId, plan.getId());
 
                             // Plan already in feed
-                            if (!userPlan.getFriends().contains(friend))
-                            {
-                                userPlan.getFriends().add(friend);
-                            }
+                            Set<String> friendsGoing = new HashSet<>(userPlan.getFriends());
+                            userPlan.setFriends(new ArrayList<>(friendsGoing));
                             feedRepository.add(userId, userPlan);
                         }
                         catch (PlanNotFoundException e)
