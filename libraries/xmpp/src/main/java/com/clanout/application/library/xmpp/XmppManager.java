@@ -77,6 +77,26 @@ public class XmppManager
         }
     }
 
+    public static void deleteChatroom(String mucId)
+    {
+        synchronized (TAG)
+        {
+            try
+            {
+                XMPPConnection connection = instance.getConnection();
+                MultiUserChatManager mucManager = MultiUserChatManager.getInstanceFor(connection);
+                MultiUserChat muc = mucManager.getMultiUserChat(mucId + XMPP_CHATROOM_POSTFIX);
+                muc.destroy("expired", null);
+
+                LOG.info("[XMPP] Deleted chatroom : " + mucId);
+            }
+            catch (Exception e)
+            {
+                LOG.error("[XMPP] Failed to delete chatroom " + mucId + " [" + e.getMessage() + "]");
+            }
+        }
+    }
+
     public static void sendMessage(String mucId, String message)
     {
         synchronized (TAG)

@@ -29,7 +29,7 @@ public class ArchivePlans
         this.feedRepository = feedRepository;
     }
 
-    public void execute()
+    public Response execute()
     {
         OffsetDateTime timestamp = OffsetDateTime.now(ZoneOffset.UTC).minusDays(2);
         LOG.info("[ARCHIVE] Starting archiving for plans with end_time before " + timestamp.toString());
@@ -56,5 +56,19 @@ public class ArchivePlans
         }
 
         LOG.info("[ARCHIVE] Archiving complete for " + plans.size() + " plans");
+
+        List<String> planIds = plans
+                .stream()
+                .map(Plan::getId)
+                .collect(Collectors.toList());
+
+        Response response = new Response();
+        response.planIds = planIds;
+        return response;
+    }
+
+    public static class Response
+    {
+        public List<String> planIds;
     }
 }
