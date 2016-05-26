@@ -8,6 +8,8 @@ import com.clanout.application.module.chat.domain.model.ChatMessage;
 import com.clanout.application.module.chat.domain.repository.ChatRepository;
 import com.clanout.application.module.plan.domain.model.Location;
 import com.clanout.application.module.plan.domain.model.Plan;
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
 
 import javax.inject.Inject;
 import java.time.OffsetDateTime;
@@ -18,11 +20,16 @@ public class ChatService
     private static final String ADMIN_NICK = XmppManager.getAdminNickname();
 
     private ChatRepository chatRepository;
+    private Gson gson;
 
     @Inject
     public ChatService(ChatRepository chatRepository)
     {
         this.chatRepository = chatRepository;
+        gson = GsonProvider
+                .getGsonBuilder()
+                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                .create();
     }
 
     public void userRegistered(String userId)
@@ -97,6 +104,6 @@ public class ChatService
     private void send(String planId, String planTitle, String message)
     {
         ChatMessage chatMessage = new ChatMessage(planId, planTitle, ADMIN_NICK, ADMIN_NICK, message);
-        XmppManager.sendMessage(chatMessage.getPlanId(), GsonProvider.getGson().toJson(chatMessage));
+        XmppManager.sendMessage(chatMessage.getPlanId(), gson.toJson(chatMessage));
     }
 }
