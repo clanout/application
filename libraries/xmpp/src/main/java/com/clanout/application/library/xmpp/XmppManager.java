@@ -47,6 +47,8 @@ public class XmppManager
                 accountManager.sensitiveOperationOverInsecureConnection(true);
 
                 accountManager.createAccount(userId, userId);
+
+                LOG.info("[XMPP] Created user : " + userId);
             }
             catch (Exception e)
             {
@@ -65,6 +67,8 @@ public class XmppManager
                 MultiUserChatManager mucManager = MultiUserChatManager.getInstanceFor(connection);
                 MultiUserChat muc = mucManager.getMultiUserChat(mucId + XMPP_CHATROOM_POSTFIX);
                 muc.create(ADMIN_NICKNAME);
+
+                LOG.info("[XMPP] Created chatroom : " + mucId);
             }
             catch (Exception e)
             {
@@ -84,6 +88,8 @@ public class XmppManager
                 MultiUserChat muc = mucManager.getMultiUserChat(mucId + XMPP_CHATROOM_POSTFIX);
                 muc.join(ADMIN_NICKNAME);
                 muc.sendMessage(message);
+
+                LOG.info("[XMPP] Sent System Message : " + message);
             }
             catch (Exception e)
             {
