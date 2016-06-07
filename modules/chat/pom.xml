@@ -14,6 +14,7 @@
     <name>clanout-application-module-chat</name>
 
     <properties>
+        <okhttp.version>2.7.5</okhttp.version>
     </properties>
 
     <dependencies>
@@ -33,6 +34,13 @@
             <groupId>com.clanout.application</groupId>
             <artifactId>lib-xmpp</artifactId>
             <version>${clanout.version}</version>
+        </dependency>
+
+        <!-- Http Client -->
+        <dependency>
+            <groupId>com.squareup.okhttp</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>${okhttp.version}</version>
         </dependency>
     </dependencies>
 </project>

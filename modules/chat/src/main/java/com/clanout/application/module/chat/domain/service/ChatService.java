@@ -19,12 +19,14 @@ public class ChatService
 {
     private static final String ADMIN_NICK = XmppManager.getAdminNickname();
 
+    private FirebaseService firebaseService;
     private ChatRepository chatRepository;
     private Gson gson;
 
     @Inject
-    public ChatService(ChatRepository chatRepository)
+    public ChatService(ChatRepository chatRepository, FirebaseService firebaseService)
     {
+        this.firebaseService = firebaseService;
         this.chatRepository = chatRepository;
         gson = GsonProvider
                 .getGsonBuilder()
@@ -34,12 +36,14 @@ public class ChatService
 
     public void userRegistered(String userId)
     {
-        XmppManager.createUser(userId);
+//        XmppManager.createUser(userId);
     }
 
     public void planCreated(String planId)
     {
-        XmppManager.createChatroom(planId);
+//        XmppManager.createChatroom(planId);
+        String message = "chat_created:" + planId;
+        send(planId, planId, message);
     }
 
     public void userJoinedPlan(Plan plan, String userId)
@@ -104,6 +108,8 @@ public class ChatService
     private void send(String planId, String planTitle, String message)
     {
         ChatMessage chatMessage = new ChatMessage(planId, planTitle, ADMIN_NICK, ADMIN_NICK, message);
-        XmppManager.sendMessage(chatMessage.getPlanId(), gson.toJson(chatMessage));
+        firebaseService.post(planId, gson.toJson(chatMessage));
+
+//        XmppManager.sendMessage(chatMessage.getPlanId(), gson.toJson(chatMessage));
     }
 }
