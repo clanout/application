@@ -43,7 +43,7 @@ public class ChatService
     {
 //        XmppManager.createChatroom(planId);
         String message = "chat_created:" + planId;
-        send(planId, planId, message);
+        send(planId, null, message);
     }
 
     public void userJoinedPlan(Plan plan, String userId)
@@ -101,7 +101,7 @@ public class ChatService
     public void planInvitationResponse(String planId, String userId, String invitationResponse)
     {
         String name = chatRepository.getUserName(userId);
-        String message = "invitation_response:" + name;
+        String message = "invitation_response:" + name + ":" + invitationResponse;
         send(planId, null, message);
     }
 
